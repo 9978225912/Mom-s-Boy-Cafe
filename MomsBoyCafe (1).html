@@ -1,0 +1,2878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Mom's Boy Café — Premium Ordering & Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   MOM'S BOY CAFÉ — COMPLETE SINGLE-FILE APPLICATION
+   Customer Panel + Admin Panel (#admin)
+   ============================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root{
+  /* Café (customer) palette */
+  --c-bg: #fff8ef;
+  --c-bg2: #ffeed4;
+  --c-cream: #fff3e0;
+  --c-brown: #4a2c1a;
+  --c-brown2: #6b3d22;
+  --c-gold: #d4a24a;
+  --c-gold2: #f0c674;
+  --c-orange: #e67324;
+  --c-red: #c0392b;
+  --c-text: #2b1a10;
+  --c-muted: #7a5a44;
+  --c-card: #ffffff;
+  --c-shadow: 0 12px 40px rgba(74,44,26,.12);
+  --c-shadow-lg: 0 24px 70px rgba(74,44,26,.22);
+
+  /* Admin luxury palette */
+  --a-bg: #0a0e1a;
+  --a-bg2: #111729;
+  --a-card: rgba(255,255,255,.04);
+  --a-border: rgba(255,255,255,.08);
+  --a-text: #e9eef9;
+  --a-muted: #8b94a8;
+  --a-gold: #f5c66b;
+  --a-gold2: #ffd98a;
+  --a-teal: #4fd1c5;
+  --a-green: #34d399;
+  --a-red: #f87171;
+  --a-blue: #60a5fa;
+}
+
+html, body {
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--c-bg);
+  color: var(--c-text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, textarea, select { font-family: inherit; }
+
+/* ============================================================
+   SPLASH SCREEN
+   ============================================================ */
+#splash{
+  position: fixed; inset: 0; z-index: 9999;
+  background: radial-gradient(circle at 50% 40%, #6b3d22 0%, #3a1f10 60%, #1b0e07 100%);
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  transition: opacity .8s ease, visibility .8s ease;
+}
+#splash.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+.splash-particles{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+.splash-particles span{
+  position:absolute; width:6px; height:6px; border-radius:50%;
+  background: radial-gradient(circle, #f0c674, transparent 70%);
+  opacity:.6;
+  animation: floatUp linear infinite;
+}
+@keyframes floatUp{
+  0%{ transform: translateY(110vh) scale(.6); opacity:0; }
+  10%{ opacity:.9; }
+  100%{ transform: translateY(-10vh) scale(1.2); opacity:0; }
+}
+.logo-wrap{ position:relative; width: 260px; height:260px; display:flex; align-items:center; justify-content:center; }
+.logo-ring{
+  position:absolute; inset:0; border-radius:50%;
+  border: 3px solid transparent;
+  border-top-color: var(--c-gold2);
+  border-right-color: var(--c-gold);
+  animation: spin 2.6s linear infinite;
+  box-shadow: 0 0 60px rgba(240,198,116,.5), inset 0 0 40px rgba(240,198,116,.2);
+}
+.logo-ring.r2{
+  inset: 18px; animation-duration: 3.4s; animation-direction: reverse;
+  border-top-color: transparent; border-right-color: transparent;
+  border-bottom-color: var(--c-orange); border-left-color: var(--c-gold);
+}
+.logo-ring.r3{
+  inset: 36px; animation-duration: 4.2s;
+  border-top-color: #fff; border-right-color: transparent;
+  border-bottom-color: transparent; border-left-color: #fff;
+  opacity:.4;
+}
+@keyframes spin{ to{ transform: rotate(360deg);} }
+.logo-core{
+  width: 170px; height:170px; border-radius:50%;
+  background: linear-gradient(145deg, #fff3e0 0%, #f0c674 50%, #d4a24a 100%);
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 4px 20px rgba(255,255,255,.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{ transform: scale(1);} 50%{ transform: scale(1.04);} }
+.logo-emoji{ font-size: 56px; filter: drop-shadow(0 4px 8px rgba(74,44,26,.3)); }
+.logo-text-mini{ font-family:'Playfair Display', serif; font-weight:800; font-size:14px; color:#4a2c1a; margin-top:2px; letter-spacing:1px; }
+.splash-title{
+  margin-top: 40px;
+  font-family:'Playfair Display', serif;
+  font-size: clamp(28px, 6vw, 44px); font-weight: 800;
+  color: #fff3e0; letter-spacing: 1.5px;
+  text-shadow: 0 4px 30px rgba(240,198,116,.6);
+  animation: fadeUp 1.2s .4s both;
+}
+.splash-sub{
+  color: #f0c674; opacity:.85; margin-top:8px;
+  font-size: 14px; letter-spacing: 4px; text-transform: uppercase;
+  animation: fadeUp 1.2s .7s both;
+}
+@keyframes fadeUp{ from{ opacity:0; transform: translateY(20px);} to{ opacity:1; transform:none;} }
+.splash-progress{
+  margin-top: 40px; width: 260px; height: 4px;
+  background: rgba(255,255,255,.1); border-radius: 99px; overflow:hidden;
+}
+.splash-progress span{
+  display:block; height:100%;
+  background: linear-gradient(90deg, var(--c-gold), var(--c-gold2), #fff, var(--c-gold2), var(--c-gold));
+  background-size: 200% 100%;
+  animation: loadbar 2.6s ease forwards, shimmer 1.4s linear infinite;
+  width:0%;
+}
+@keyframes loadbar{ to{ width:100%; } }
+@keyframes shimmer{ to{ background-position: 200% 0; } }
+
+/* ============================================================
+   OFFLINE OVERLAY
+   ============================================================ */
+#offlineOverlay{
+  position: fixed; inset:0; z-index: 99999;
+  background: rgba(0,0,0,.92); color:#fff;
+  display:none; align-items:center; justify-content:center; flex-direction:column;
+  text-align:center; padding: 24px;
+}
+#offlineOverlay.show{ display:flex; }
+#offlineOverlay .icon{ font-size: 80px; animation: pulse 1.6s infinite; }
+#offlineOverlay h2{ font-family:'Playfair Display', serif; margin-top: 16px; font-size: 28px; }
+#offlineOverlay p{ opacity:.7; margin-top: 8px; }
+
+/* ============================================================
+   CUSTOMER PANEL
+   ============================================================ */
+#customerApp{ min-height: 100vh; display:none; flex-direction:column; }
+#customerApp.show{ display:flex; }
+
+.c-topbar{
+  position: sticky; top:0; z-index: 100;
+  background: linear-gradient(135deg, #4a2c1a 0%, #6b3d22 100%);
+  color: #fff3e0;
+  padding: 12px 18px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow: 0 4px 20px rgba(74,44,26,.3);
+  backdrop-filter: blur(10px);
+}
+.brand{ display:flex; align-items:center; gap:10px; font-family:'Playfair Display', serif; font-weight:800; font-size: 18px; }
+.brand .bcup{
+  width: 36px; height:36px; border-radius:50%;
+  background: linear-gradient(145deg, var(--c-gold2), var(--c-gold));
+  display:flex; align-items:center; justify-content:center;
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+  animation: spin 14s linear infinite;
+}
+.brand small{ display:block; font-size:10px; font-weight:500; letter-spacing:2px; opacity:.7; font-family:'Poppins',sans-serif; }
+.c-topbar-actions{ display:flex; gap:8px; align-items:center; }
+.lang-select{
+  background: rgba(255,255,255,.12); color:#fff;
+  border: 1px solid rgba(255,255,255,.18); border-radius: 99px;
+  padding: 7px 12px; font-size:13px; outline: none;
+}
+.lang-select option{ color:#000; }
+.cafe-status-pill{
+  display:flex; align-items:center; gap:6px;
+  background: rgba(52,211,153,.18); color: #6ee7b7;
+  padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight:600;
+  border:1px solid rgba(110,231,183,.4);
+}
+.cafe-status-pill.closed{ background: rgba(248,113,113,.18); color:#fca5a5; border-color: rgba(252,165,165,.4); }
+.cafe-status-pill .dot{ width:8px; height:8px; border-radius:50%; background:currentColor; box-shadow: 0 0 8px currentColor; animation: pulse 1.5s infinite; }
+
+/* Positive marquee */
+.positive-banner{
+  background: linear-gradient(90deg, var(--c-gold) 0%, var(--c-gold2) 50%, var(--c-gold) 100%);
+  color: #4a2c1a; overflow:hidden; position: relative;
+  padding: 8px 0; font-weight:600; font-size:13px;
+}
+.positive-banner .track{
+  display: inline-block; white-space: nowrap;
+  animation: marquee 28s linear infinite;
+  padding-left:100%;
+}
+.positive-banner .track span{ margin-right: 60px; }
+@keyframes marquee{ from{ transform: translateX(0);} to{ transform: translateX(-100%);} }
+
+.c-main{ flex:1; padding: 24px 18px 120px; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+/* Screens (sections that swap in) */
+.screen{ display:none; animation: screenIn .55s ease both; }
+.screen.active{ display:block; }
+@keyframes screenIn{ from{ opacity:0; transform: translateY(14px);} to{ opacity:1; transform:none;} }
+
+/* ----- Info screen ----- */
+.info-card{
+  background: var(--c-card); border-radius: 24px; padding: 28px;
+  box-shadow: var(--c-shadow); max-width: 560px; margin: 16px auto;
+}
+.info-card h2{ font-family:'Playfair Display', serif; font-size: 26px; color: var(--c-brown); margin-bottom:6px; }
+.info-card .sub{ color: var(--c-muted); font-size: 14px; margin-bottom:18px; }
+.field{ margin-bottom: 14px; }
+.field label{ display:block; font-size:13px; font-weight:600; color: var(--c-brown); margin-bottom:6px; }
+.field input, .field textarea, .field select{
+  width:100%; padding: 12px 14px; border: 2px solid #f0e0c8;
+  border-radius: 12px; background:#fffaf3; font-size:15px; color:var(--c-text);
+  transition: all .25s;
+}
+.field input:focus, .field textarea:focus{ outline:none; border-color: var(--c-gold); box-shadow: 0 0 0 4px rgba(212,162,74,.18); background:#fff; }
+.field textarea{ resize: vertical; min-height: 80px; }
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding: 12px 22px; border-radius: 99px;
+  font-weight:600; font-size:15px;
+  background: linear-gradient(135deg, var(--c-orange), #d35400);
+  color:#fff; box-shadow: 0 10px 24px rgba(230,115,36,.35);
+  transition: transform .18s, box-shadow .18s;
+}
+.btn:hover{ transform: translateY(-2px); box-shadow: 0 14px 30px rgba(230,115,36,.45); }
+.btn:active{ transform: translateY(0); }
+.btn.ghost{ background: transparent; color: var(--c-brown); border: 2px solid var(--c-brown); box-shadow:none; }
+.btn.gold{ background: linear-gradient(135deg, var(--c-gold), var(--c-gold2)); color:#4a2c1a; box-shadow: 0 10px 24px rgba(212,162,74,.35); }
+.btn.block{ width:100%; }
+
+.location-row{ display:flex; gap:10px; flex-wrap:wrap; }
+.location-row .btn{ flex:1; min-width: 140px; }
+.map-preview{
+  margin-top: 12px; height: 150px; border-radius: 14px; position: relative; overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 50%, rgba(255,255,255,.4), transparent 40%),
+    repeating-linear-gradient(45deg, #b9dca6 0 18px, #a8cc94 18px 36px),
+    linear-gradient(135deg, #c9e3b2, #93b97c);
+  border: 2px dashed #88aa6a;
+}
+.map-preview::before{
+  content:""; position:absolute; top:0; left:30%; width:3px; height:100%;
+  background: rgba(255,255,255,.6);
+}
+.map-preview::after{
+  content:""; position:absolute; top:50%; left:0; width:100%; height:4px;
+  background: rgba(255,255,255,.5);
+}
+.map-pin{ position:absolute; top:50%; left:50%; transform: translate(-50%,-100%); font-size: 32px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); animation: bounce 1.4s infinite; }
+@keyframes bounce{ 0%,100%{ transform: translate(-50%,-100%);} 50%{ transform: translate(-50%,-115%);} }
+.map-coords{ position:absolute; bottom:8px; left:8px; right:8px; background: rgba(0,0,0,.55); color:#fff; padding:6px 10px; border-radius:8px; font-size:11px; text-align:center; }
+
+/* ----- Main choice screen ----- */
+.choice-grid{
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px; margin-top: 24px;
+}
+.choice-card{
+  position: relative; overflow: hidden;
+  background: var(--c-card); border-radius: 24px; padding: 30px 24px;
+  box-shadow: var(--c-shadow); cursor: pointer;
+  transition: transform .3s, box-shadow .3s;
+  border: 1px solid rgba(212,162,74,.18);
+}
+.choice-card:hover{ transform: translateY(-6px); box-shadow: var(--c-shadow-lg); }
+.choice-card .icon{
+  width: 76px; height:76px; border-radius: 22px;
+  background: linear-gradient(135deg, var(--c-orange), var(--c-gold));
+  display:flex; align-items:center; justify-content:center;
+  font-size: 38px; box-shadow: 0 10px 22px rgba(230,115,36,.35);
+  margin-bottom: 16px;
+}
+.choice-card h3{ font-family:'Playfair Display', serif; font-size: 22px; color: var(--c-brown); margin-bottom: 6px; }
+.choice-card p{ color: var(--c-muted); font-size: 14px; line-height: 1.5; }
+.choice-card::before{
+  content:""; position: absolute; top:-50%; right:-30%; width: 200px; height:200px;
+  background: radial-gradient(circle, rgba(240,198,116,.3), transparent 70%);
+  border-radius: 50%; pointer-events:none;
+}
+
+.welcome-hero{
+  text-align:center; padding: 12px 6px 4px;
+}
+.welcome-hero h1{
+  font-family:'Playfair Display', serif; font-size: clamp(26px, 5.5vw, 38px);
+  color: var(--c-brown); margin-bottom: 6px;
+}
+.welcome-hero p{ color: var(--c-muted); font-size: 15px; }
+.welcome-hero .hey{ color: var(--c-orange); font-weight:700; }
+
+/* ----- Menu ----- */
+.cat-tabs{
+  display:flex; gap:10px; overflow-x:auto; padding: 8px 4px 16px; -webkit-overflow-scrolling: touch;
+}
+.cat-tab{
+  flex-shrink:0; background: var(--c-card); color: var(--c-brown);
+  padding: 12px 22px; border-radius: 99px; font-weight: 600;
+  box-shadow: 0 4px 14px rgba(74,44,26,.08); border: 2px solid transparent;
+  display:flex; align-items:center; gap:8px; transition: all .25s;
+}
+.cat-tab.active{ background: linear-gradient(135deg, var(--c-orange), #d35400); color:#fff; box-shadow: 0 10px 24px rgba(230,115,36,.35); }
+.cat-tab:hover:not(.active){ border-color: var(--c-gold); }
+
+.menu-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+.menu-card{
+  background: var(--c-card); border-radius: 20px; overflow: hidden;
+  box-shadow: var(--c-shadow); position: relative;
+  transition: transform .25s, box-shadow .25s;
+  display:flex; flex-direction:column;
+}
+.menu-card:hover{ transform: translateY(-4px); box-shadow: var(--c-shadow-lg); }
+.menu-card .thumb{
+  height: 130px; display:flex; align-items:center; justify-content:center;
+  font-size: 70px;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b6);
+  position: relative;
+}
+.menu-card .body{ padding: 14px 16px 16px; flex:1; display:flex; flex-direction:column; }
+.menu-card h4{ font-family:'Playfair Display', serif; font-size:18px; color: var(--c-brown); margin-bottom: 4px; }
+.menu-card .desc{ font-size: 12.5px; color: var(--c-muted); flex:1; margin-bottom: 10px; line-height: 1.4; }
+.menu-card .rating{ display:flex; align-items:center; gap:4px; font-size: 12px; color: var(--c-muted); margin-bottom: 8px; }
+.menu-card .rating .stars{ color: #f5b400; letter-spacing: -1px; }
+.menu-card .pricerow{ display:flex; justify-content: space-between; align-items: center; }
+.menu-card .price{ font-weight:800; color: var(--c-brown); font-size: 18px; }
+.add-btn{
+  background: linear-gradient(135deg, var(--c-orange), #d35400); color:#fff;
+  padding: 8px 14px; border-radius: 99px; font-weight:600; font-size: 13px;
+  box-shadow: 0 6px 14px rgba(230,115,36,.35); transition: transform .15s;
+}
+.add-btn:hover{ transform: scale(1.05); }
+.qty-stepper{ display:inline-flex; align-items:center; gap:6px; background: #fff3e0; border-radius: 99px; padding: 4px; }
+.qty-stepper button{
+  width:28px; height:28px; border-radius:50%; background:#fff;
+  font-weight:800; color: var(--c-brown); box-shadow: 0 2px 6px rgba(0,0,0,.1);
+}
+.qty-stepper span{ min-width: 24px; text-align:center; font-weight:700; color:var(--c-brown); }
+
+.menu-card.disabled .body{ opacity:.4; }
+.menu-card.disabled::after{
+  content:"OUT OF STOCK"; position:absolute; top:50%; left:50%;
+  transform: translate(-50%,-50%) rotate(-15deg);
+  background: rgba(192,57,43,.92); color:#fff; padding: 8px 22px; border-radius: 8px;
+  font-weight:800; letter-spacing: 2px; font-size:13px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.3);
+}
+.reviews-link{ font-size:11px; color: var(--c-orange); cursor:pointer; text-decoration: underline; margin-top:4px; }
+
+/* Floating cart */
+.fab-cart{
+  position: fixed; bottom: 22px; right: 22px; z-index: 50;
+  background: linear-gradient(135deg, var(--c-orange), #d35400); color:#fff;
+  border-radius: 99px; padding: 14px 22px;
+  display:flex; align-items:center; gap:10px; font-weight:700;
+  box-shadow: 0 14px 36px rgba(230,115,36,.5);
+  transition: transform .25s;
+}
+.fab-cart:hover{ transform: scale(1.05); }
+.fab-cart.bump{ animation: bump .4s; }
+@keyframes bump{ 0%,100%{ transform: scale(1);} 50%{ transform: scale(1.18);} }
+.fab-cart .count{
+  background: #fff; color: var(--c-orange); border-radius: 99px;
+  width: 26px; height:26px; display:inline-flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:800;
+}
+
+/* ----- Cart screen ----- */
+.cart-list{ background: var(--c-card); border-radius: 20px; padding: 10px; box-shadow: var(--c-shadow); }
+.cart-item{
+  display:grid; grid-template-columns: 50px 1fr auto auto; gap: 12px;
+  align-items:center; padding: 12px; border-bottom: 1px dashed #eee0c2;
+}
+.cart-item:last-child{ border-bottom:none; }
+.cart-item .ic{ font-size: 32px; }
+.cart-item .name{ font-weight:600; color: var(--c-brown); font-size: 15px; }
+.cart-item .price-small{ color: var(--c-muted); font-size: 12px; }
+.cart-item .remove{ color: var(--c-red); font-size: 20px; padding: 0 8px; }
+.totals{ background: var(--c-card); border-radius: 20px; padding: 18px; box-shadow: var(--c-shadow); margin-top: 14px; }
+.totals .row{ display:flex; justify-content:space-between; padding: 6px 0; font-size:14px; color: var(--c-brown); }
+.totals .row.total{ font-size: 18px; font-weight:800; border-top: 2px dashed #eee0c2; padding-top: 10px; margin-top:6px; }
+.empty-cart{ text-align:center; padding: 60px 20px; color: var(--c-muted); }
+.empty-cart .em{ font-size: 70px; }
+
+/* ----- Order tracking ----- */
+.track-card{ background: var(--c-card); border-radius: 22px; padding: 24px; box-shadow: var(--c-shadow); margin-bottom: 16px; }
+.order-num-badge{
+  background: linear-gradient(135deg, var(--c-gold), var(--c-gold2)); color: #4a2c1a;
+  padding: 6px 14px; border-radius: 99px; font-weight:800; display: inline-block; margin-bottom: 6px;
+}
+.steps{ display:flex; align-items: flex-start; justify-content: space-between; margin-top: 18px; position: relative; }
+.steps::before{
+  content:""; position:absolute; top: 18px; left: 8%; right: 8%; height: 3px;
+  background: #f0e0c8; z-index:0; border-radius: 99px;
+}
+.steps .progress-line{
+  position:absolute; top:18px; left:8%; height:3px; background: linear-gradient(90deg, var(--c-orange), var(--c-gold)); z-index:1; border-radius: 99px;
+  transition: width .8s ease;
+}
+.step{ position: relative; z-index: 2; text-align:center; flex:1; }
+.step .dot{
+  width: 36px; height:36px; border-radius: 50%; background:#f0e0c8;
+  display:inline-flex; align-items:center; justify-content:center; font-weight:800; color: var(--c-muted);
+  border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  transition: all .35s;
+}
+.step.done .dot{ background: linear-gradient(135deg, var(--c-orange), var(--c-gold)); color:#fff; box-shadow: 0 6px 16px rgba(230,115,36,.4); }
+.step .label{ font-size: 11px; margin-top: 6px; color: var(--c-muted); font-weight:600; }
+.step.done .label{ color: var(--c-brown); }
+
+.delivery-card{
+  display:flex; gap:14px; align-items:center;
+  background: linear-gradient(135deg, #fff3e0, #fff); border-radius: 16px; padding: 14px;
+  border: 1px solid rgba(212,162,74,.25);
+}
+.dp-avatar{
+  width: 56px; height:56px; border-radius:50%;
+  background: linear-gradient(135deg, var(--c-orange), var(--c-gold)); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size: 26px; font-weight:800;
+  box-shadow: 0 6px 14px rgba(230,115,36,.35);
+}
+.dp-info{ flex:1; }
+.dp-info .n{ font-weight:700; color: var(--c-brown); }
+.dp-info .ph{ font-size:13px; color: var(--c-muted); }
+.call-btn{ background: #27ae60; color:#fff; padding: 10px 16px; border-radius: 99px; font-weight:600; font-size:13px; }
+
+.live-map{
+  margin-top: 12px; height: 200px; border-radius: 14px; position:relative; overflow:hidden;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 20px, rgba(0,0,0,.04) 20px 21px),
+    repeating-linear-gradient(90deg, transparent 0 20px, rgba(0,0,0,.04) 20px 21px),
+    linear-gradient(135deg, #d4e9c5, #aacf91);
+  border: 1px solid #88aa6a;
+}
+.route-line{
+  position:absolute; top:50%; left:10%; right:10%; height:0;
+  border-top: 3px dashed var(--c-brown); opacity:.6;
+}
+.rider{
+  position:absolute; top:50%; left:10%; transform: translate(-50%,-50%);
+  font-size: 32px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4));
+  animation: ride 7s linear infinite;
+}
+@keyframes ride{ 0%{ left:10%;} 100%{ left:90%;} }
+.dest{ position:absolute; top:50%; right:5%; transform: translate(0,-50%); font-size:30px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
+.start{ position:absolute; top:50%; left:5%; transform: translate(0,-50%); font-size:28px; }
+
+/* ----- Modals ----- */
+.modal-backdrop{
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(20,10,5,.55); backdrop-filter: blur(8px);
+  display:none; align-items:center; justify-content:center; padding: 18px;
+  animation: fadeIn .25s ease;
+}
+.modal-backdrop.show{ display:flex; }
+@keyframes fadeIn{ from{ opacity:0;} to{ opacity:1;} }
+.modal{
+  background: #fff; border-radius: 24px; max-width: 480px; width:100%;
+  padding: 28px; box-shadow: var(--c-shadow-lg);
+  max-height: 90vh; overflow-y: auto;
+  animation: popIn .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{ from{ opacity:0; transform: scale(.85);} to{ opacity:1; transform: scale(1);} }
+.modal h3{ font-family:'Playfair Display', serif; font-size:22px; color: var(--c-brown); margin-bottom:8px; }
+.modal p{ color: var(--c-muted); font-size:14px; line-height:1.55; margin-bottom: 14px; }
+.modal-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
+.modal-actions .btn{ flex:1; min-width: 110px; }
+
+.payment-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 10px; margin: 10px 0; }
+.pay-app{
+  background: #fff8ef; border: 2px solid #f0e0c8; border-radius: 14px; padding: 12px 6px;
+  text-align:center; cursor:pointer; transition: all .2s;
+}
+.pay-app:hover{ border-color: var(--c-orange); transform: translateY(-2px); }
+.pay-app .pa-ic{
+  width: 44px; height:44px; border-radius: 12px; margin: 0 auto 6px;
+  display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:18px;
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+.pay-app .nm{ font-size:11px; font-weight:600; color: var(--c-brown); }
+
+.upi-card{ background:#fff8ef; border-radius:14px; padding:14px; margin-top:10px; }
+.upi-card .upi-row{ display:flex; align-items:center; gap:8px; }
+.upi-card .upi-row code{ flex:1; background:#fff; padding: 10px 12px; border-radius: 8px; border:1px solid #f0e0c8; font-family: monospace; font-size:13px; color: var(--c-brown); word-break: break-all; }
+.qr-card{ background:#fff; border-radius:14px; padding:14px; margin-top:10px; text-align:center; border: 2px dashed var(--c-gold); }
+.qr-card img{ max-width: 220px; width:100%; border-radius: 10px; }
+
+/* Coming Soon */
+.coming-soon{ text-align:center; padding: 10px 0; }
+.coming-soon .big-em{ font-size: 72px; animation: floatY 2s infinite; }
+@keyframes floatY{ 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-8px);} }
+
+/* Thank you */
+.thanks{ text-align:center; padding: 30px 10px; }
+.thanks .heart{ font-size: 80px; animation: heartbeat 1.4s infinite; }
+@keyframes heartbeat{ 0%,100%{ transform: scale(1);} 30%{ transform: scale(1.18);} 50%{ transform: scale(1);} 70%{ transform: scale(1.18);} }
+.thanks h2{ font-family:'Playfair Display', serif; font-size:30px; color: var(--c-brown); margin: 8px 0; }
+.thanks p{ color: var(--c-muted); }
+
+/* Confetti */
+.confetti{ position: fixed; inset: 0; pointer-events:none; z-index: 600; overflow: hidden; }
+.confetti span{
+  position: absolute; top: -10vh;
+  width: 10px; height: 14px; border-radius: 2px;
+  animation: fall 3.5s linear forwards;
+}
+@keyframes fall{
+  0%{ transform: translateY(0) rotate(0deg); opacity: 1; }
+  100%{ transform: translateY(110vh) rotate(720deg); opacity: .2; }
+}
+
+/* Ad popup */
+#adPopup{
+  position: fixed; inset:0; z-index: 700;
+  background: rgba(0,0,0,.7); backdrop-filter: blur(6px);
+  display:none; align-items:center; justify-content:center; padding: 18px;
+}
+#adPopup.show{ display:flex; }
+.ad-box{
+  position:relative; max-width: 520px; width:100%;
+  background:#fff; border-radius: 20px; overflow:hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,.5);
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+.ad-close{
+  position:absolute; top:10px; right:10px; z-index:2;
+  width: 36px; height:36px; border-radius:50%;
+  background: rgba(0,0,0,.7); color:#fff; font-size:18px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+}
+.ad-box img, .ad-box video{ width:100%; display:block; max-height: 70vh; object-fit: cover; }
+.ad-caption{ padding: 12px 16px; font-weight:600; color: var(--c-brown); }
+
+/* Closed banner */
+#cafeClosedOverlay{
+  position: fixed; inset:0; z-index: 400;
+  background: linear-gradient(135deg, rgba(74,44,26,.97), rgba(40,20,10,.97));
+  color: #fff3e0; display:none; align-items:center; justify-content:center;
+  text-align:center; padding: 30px; flex-direction:column;
+}
+#cafeClosedOverlay.show{ display:flex; }
+#cafeClosedOverlay h1{ font-family:'Playfair Display', serif; font-size: clamp(28px, 7vw, 48px); margin: 10px 0; }
+#cafeClosedOverlay .em{ font-size: 90px; animation: pulse 1.8s infinite; }
+#cafeClosedOverlay p{ max-width: 520px; line-height:1.6; opacity:.9; }
+
+/* Footer */
+.app-footer{
+  text-align:center; padding: 18px; color: var(--c-muted); font-size:13px;
+  background: rgba(255,243,224,.6); border-top: 1px solid rgba(212,162,74,.2);
+}
+.app-footer a{ color: var(--c-orange); font-weight:700; text-decoration:none; }
+.app-footer a:hover{ text-decoration: underline; }
+
+/* Section title */
+.section-title{
+  font-family:'Playfair Display', serif; color: var(--c-brown);
+  font-size: 24px; margin: 8px 0 14px;
+  display:flex; align-items:center; gap:10px;
+}
+.back-btn{
+  background: var(--c-card); color: var(--c-brown); padding: 8px 14px;
+  border-radius: 99px; font-weight:600; font-size:13px;
+  box-shadow: 0 4px 12px rgba(74,44,26,.08); margin-bottom: 10px;
+  display:inline-flex; align-items:center; gap:6px;
+}
+
+/* Review pill (stars) */
+.star-input{ display:flex; gap: 4px; font-size: 30px; cursor: pointer; }
+.star-input span{ color: #ddd; transition: transform .15s; }
+.star-input span.on{ color: #f5b400; }
+.star-input span:hover{ transform: scale(1.15); }
+
+/* ============================================================
+   ADMIN PANEL
+   ============================================================ */
+#adminApp{ display:none; min-height: 100vh; background: var(--a-bg); color: var(--a-text); }
+#adminApp.show{ display: block; }
+
+.admin-bg{
+  position: fixed; inset:0; z-index: 0; pointer-events:none;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(79,209,197,.12), transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(245,198,107,.10), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(96,165,250,.08), transparent 50%),
+    var(--a-bg);
+}
+.admin-shell{ position: relative; z-index:1; display:flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar{
+  width: 260px; background: rgba(255,255,255,.025);
+  border-right: 1px solid var(--a-border);
+  padding: 22px 14px; display:flex; flex-direction:column;
+  position: sticky; top:0; height: 100vh; overflow-y:auto;
+  backdrop-filter: blur(20px);
+}
+.sidebar .logo{
+  display:flex; gap:10px; align-items:center; padding: 6px 10px 16px; border-bottom: 1px solid var(--a-border); margin-bottom: 12px;
+}
+.sidebar .logo .lg{
+  width: 40px; height:40px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--a-gold), var(--a-gold2));
+  display:flex; align-items:center; justify-content:center; font-size: 22px;
+  box-shadow: 0 6px 14px rgba(245,198,107,.3);
+}
+.sidebar .logo h2{ font-family:'Playfair Display',serif; font-size: 16px; color: var(--a-gold2); }
+.sidebar .logo small{ color: var(--a-muted); font-size: 10px; letter-spacing:2px; }
+
+.nav-item{
+  display:flex; align-items:center; gap: 10px;
+  padding: 11px 14px; border-radius: 12px;
+  color: var(--a-muted); font-weight: 500; font-size:14px;
+  cursor:pointer; transition: all .2s; margin-bottom: 3px;
+}
+.nav-item:hover{ background: rgba(255,255,255,.04); color: var(--a-text); }
+.nav-item.active{
+  background: linear-gradient(135deg, rgba(245,198,107,.18), rgba(245,198,107,.08));
+  color: var(--a-gold2); border: 1px solid rgba(245,198,107,.3);
+}
+.nav-item .ic{ font-size: 18px; }
+.nav-item .badge{
+  margin-left:auto; background: var(--a-red); color:#fff; font-size:10px; padding:2px 8px; border-radius:99px; font-weight:700;
+}
+
+/* Main admin area */
+.admin-main{ flex:1; padding: 24px; min-width: 0; }
+@media(max-width: 880px){
+  .admin-shell{ flex-direction: column; }
+  .sidebar{ width: 100%; height: auto; position: relative; border-right:none; border-bottom:1px solid var(--a-border); }
+  .sidebar nav{ display:flex; flex-wrap:wrap; gap:6px; }
+  .nav-item{ flex: 1 1 calc(50% - 6px); justify-content:center; padding: 10px; font-size:12px; }
+  .nav-item .badge{ margin-left: 6px; }
+}
+
+.admin-topbar{
+  display:flex; align-items:center; justify-content:space-between; gap: 12px;
+  margin-bottom: 20px; flex-wrap: wrap;
+}
+.admin-topbar h1{ font-family:'Playfair Display', serif; font-size: 26px; color: var(--a-text); }
+.admin-topbar .sub{ color: var(--a-muted); font-size: 13px; margin-top: 2px; }
+.search-box{
+  background: rgba(255,255,255,.04); border: 1px solid var(--a-border); border-radius: 99px;
+  padding: 8px 16px; display:flex; align-items:center; gap: 8px; flex:1; min-width: 180px; max-width: 320px;
+}
+.search-box input{ flex:1; background: transparent; border:none; color: var(--a-text); outline: none; font-size: 14px; }
+.search-box input::placeholder{ color: var(--a-muted); }
+.logout-btn{
+  background: linear-gradient(135deg, var(--a-red), #ef4444); color: #fff;
+  padding: 8px 14px; border-radius: 99px; font-weight: 600; font-size: 13px;
+}
+
+.kpi-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.kpi{
+  background: var(--a-card); border: 1px solid var(--a-border); border-radius: 18px;
+  padding: 18px; backdrop-filter: blur(10px);
+  position: relative; overflow: hidden;
+}
+.kpi::before{
+  content:""; position: absolute; top:-30px; right:-30px; width:100px; height:100px;
+  border-radius: 50%; background: radial-gradient(circle, rgba(245,198,107,.15), transparent 70%);
+}
+.kpi .lbl{ font-size: 12px; color: var(--a-muted); text-transform: uppercase; letter-spacing: 1px; }
+.kpi .val{ font-family:'Playfair Display',serif; font-size: 32px; color: var(--a-gold2); margin-top: 4px; font-weight: 800; }
+.kpi .ic{ font-size: 22px; margin-bottom: 4px; }
+
+.panel{
+  background: var(--a-card); border: 1px solid var(--a-border); border-radius: 18px;
+  padding: 20px; margin-bottom: 16px; backdrop-filter: blur(10px);
+}
+.panel h3{ font-family:'Playfair Display', serif; font-size: 18px; color: var(--a-gold2); margin-bottom: 14px; }
+.panel-subtle{ background: transparent; border: 1px dashed var(--a-border); }
+
+.section{ display:none; animation: screenIn .35s ease both; }
+.section.active{ display:block; }
+
+/* Tables */
+.tbl{ width:100%; border-collapse: collapse; font-size: 13px; }
+.tbl th{ text-align:left; padding: 10px 12px; background: rgba(255,255,255,.03); color: var(--a-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+.tbl td{ padding: 10px 12px; border-top: 1px solid var(--a-border); }
+.tbl tr:hover td{ background: rgba(255,255,255,.02); }
+.tbl .actions{ display:flex; gap:6px; }
+.tbtn{
+  background: rgba(255,255,255,.06); border:1px solid var(--a-border);
+  color: var(--a-text); padding: 6px 10px; border-radius: 8px; font-size:12px; font-weight:600;
+  transition: all .2s;
+}
+.tbtn:hover{ background: rgba(255,255,255,.12); }
+.tbtn.gold{ background: linear-gradient(135deg, var(--a-gold), var(--a-gold2)); color: #1a1f2e; border-color: transparent; }
+.tbtn.red{ background: rgba(248,113,113,.15); color: var(--a-red); border-color: rgba(248,113,113,.3); }
+.tbtn.green{ background: rgba(52,211,153,.15); color: var(--a-green); border-color: rgba(52,211,153,.3); }
+.tbtn.blue{ background: rgba(96,165,250,.15); color: var(--a-blue); border-color: rgba(96,165,250,.3); }
+
+/* Form */
+.afield{ margin-bottom: 12px; }
+.afield label{ display:block; font-size: 12px; color: var(--a-muted); text-transform: uppercase; letter-spacing:1px; margin-bottom: 6px; }
+.afield input, .afield textarea, .afield select{
+  width:100%; padding: 11px 14px; background: rgba(255,255,255,.04);
+  border: 1px solid var(--a-border); border-radius: 10px; color: var(--a-text);
+  font-size: 14px; outline: none; transition: all .2s;
+}
+.afield input:focus, .afield textarea:focus, .afield select:focus{
+  border-color: var(--a-gold); box-shadow: 0 0 0 4px rgba(245,198,107,.15);
+}
+.afield textarea{ resize: vertical; min-height: 80px; }
+
+.aforms-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 10px; }
+
+/* Toggle */
+.toggle{
+  position: relative; width: 44px; height: 24px; background: rgba(255,255,255,.1);
+  border-radius: 99px; cursor: pointer; transition: all .2s;
+}
+.toggle::before{
+  content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition: all .2s;
+}
+.toggle.on{ background: var(--a-green); }
+.toggle.on::before{ left: 23px; }
+
+/* Login screen */
+#adminLogin{
+  position: fixed; inset:0; z-index: 200; display:none;
+  align-items:center; justify-content:center; padding: 20px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(245,198,107,.15), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(79,209,197,.12), transparent 40%),
+    linear-gradient(135deg, #0a0e1a, #161d33);
+}
+#adminLogin.show{ display:flex; }
+.login-card{
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 36px 30px;
+  max-width: 420px; width: 100%;
+  box-shadow: 0 30px 80px rgba(0,0,0,.5);
+  animation: popIn .5s cubic-bezier(.34,1.56,.64,1);
+}
+.login-card .lg-logo{
+  width: 72px; height:72px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--a-gold), var(--a-gold2));
+  display:flex; align-items:center; justify-content:center; font-size: 38px;
+  margin: 0 auto 16px; box-shadow: 0 14px 30px rgba(245,198,107,.4);
+  animation: pulse 2s infinite;
+}
+.login-card h2{ text-align:center; font-family:'Playfair Display', serif; font-size: 24px; color: var(--a-gold2); margin-bottom: 4px; }
+.login-card .ltag{ text-align:center; color: var(--a-muted); font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 22px; }
+.shake{ animation: shake .4s; }
+@keyframes shake{ 10%,90%{ transform: translate3d(-2px,0,0);} 20%,80%{ transform: translate3d(4px,0,0);} 30%,50%,70%{ transform: translate3d(-6px,0,0);} 40%,60%{ transform: translate3d(6px,0,0);} }
+.login-card .btn{ width:100%; background: linear-gradient(135deg, var(--a-gold), var(--a-gold2)); color:#1a1f2e; box-shadow: 0 10px 24px rgba(245,198,107,.35); }
+.login-card .err{ color: var(--a-red); font-size: 13px; margin-top: 8px; text-align:center; min-height: 18px; }
+.login-card .hint{ font-size: 11px; color: var(--a-muted); text-align:center; margin-top: 14px; line-height:1.6; }
+
+/* Admin order card */
+.order-row{
+  background: rgba(255,255,255,.03); border: 1px solid var(--a-border);
+  border-radius: 14px; padding: 14px; margin-bottom: 10px;
+  display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  font-size: 13px;
+}
+.order-row.new{ border-color: var(--a-gold); box-shadow: 0 0 30px rgba(245,198,107,.25); animation: flash 1.4s 3; }
+@keyframes flash{ 0%,100%{ box-shadow: 0 0 30px rgba(245,198,107,.25);} 50%{ box-shadow: 0 0 50px rgba(245,198,107,.6);} }
+.order-row .lbl{ color: var(--a-muted); font-size:11px; text-transform: uppercase; letter-spacing: 1px; }
+.order-row .val{ color: var(--a-text); font-weight: 600; }
+.order-row .full{ grid-column: 1/-1; }
+.order-row .items-list{ font-size: 12px; color: var(--a-muted); line-height:1.5; }
+.status-badge{
+  display: inline-block; padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+}
+.status-placed{ background: rgba(96,165,250,.15); color: var(--a-blue); }
+.status-confirmed{ background: rgba(245,198,107,.15); color: var(--a-gold2); }
+.status-preparing{ background: rgba(245,158,11,.18); color: #fbbf24; }
+.status-ready{ background: rgba(167,139,250,.18); color: #c4b5fd; }
+.status-out{ background: rgba(79,209,197,.18); color: var(--a-teal); }
+.status-delivered{ background: rgba(52,211,153,.18); color: var(--a-green); }
+
+/* Flash border alert */
+.flash-alert{
+  position: fixed; inset:0; pointer-events:none; z-index: 300;
+  box-shadow: inset 0 0 0 0 var(--a-red);
+  transition: box-shadow .25s;
+}
+.flash-alert.on{ box-shadow: inset 0 0 0 8px var(--a-red); }
+
+/* Print bill area */
+#printBillArea{ display:none; }
+@media print {
+  body * { visibility: hidden; }
+  #printBillArea, #printBillArea * { visibility: visible; }
+  #printBillArea{ display:block; position: absolute; top:0; left:0; width:100%; padding: 30px; font-family: 'Inter', sans-serif; color:#000; background:#fff; }
+}
+
+/* Misc */
+.scroll-x{ overflow-x:auto; }
+.spacer{ height: 30px; }
+.row-flex{ display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
+.tag{ display:inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight:700; }
+.tag.ok{ background: rgba(52,211,153,.18); color: var(--a-green); }
+.tag.bad{ background: rgba(248,113,113,.18); color: var(--a-red); }
+
+/* Spinner */
+.spinner{
+  width: 50px; height: 50px; border-radius: 50%;
+  border: 4px solid rgba(0,0,0,.08); border-top-color: var(--c-orange);
+  animation: spin 1s linear infinite; margin: 16px auto;
+}
+.spinner.dark{ border-color: rgba(255,255,255,.08); border-top-color: var(--a-gold2); }
+
+/* Activity log */
+.log-item{
+  padding: 10px 12px; border-left: 3px solid var(--a-gold);
+  background: rgba(245,198,107,.04); border-radius: 0 10px 10px 0;
+  margin-bottom: 6px; font-size: 13px;
+}
+.log-item .ts{ color: var(--a-muted); font-size: 11px; }
+.log-item .ac{ color: var(--a-text); margin-top: 2px; }
+
+.review-item{
+  padding: 12px; border-radius: 12px; background: rgba(255,255,255,.03);
+  border: 1px solid var(--a-border); margin-bottom: 8px;
+}
+.review-item .head{ display:flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.review-item .who{ font-weight: 600; }
+.review-item .star{ color: #f5b400; }
+
+.list-item{
+  display:flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.03);
+  border: 1px solid var(--a-border); margin-bottom: 8px;
+}
+.list-item:hover{ background: rgba(255,255,255,.05); }
+
+/* Customer footer fixed bottom safe area */
+@media(max-width: 540px){
+  .menu-card .thumb{ font-size: 50px; height: 100px; }
+  .info-card{ padding: 20px; }
+  .modal{ padding: 22px; }
+  .c-main{ padding: 18px 12px 120px; }
+  .splash-title{ font-size: 30px; }
+  .logo-wrap{ width: 220px; height: 220px; }
+  .logo-core{ width: 140px; height: 140px; }
+  .logo-emoji{ font-size: 44px; }
+}
+
+/* Toast */
+.toast{
+  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.85); color:#fff; padding: 12px 20px;
+  border-radius: 99px; font-size: 14px; font-weight: 500;
+  z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,.3);
+  animation: toastIn .3s ease;
+}
+@keyframes toastIn{ from{ opacity:0; transform: translate(-50%, 20px);} to{ opacity:1; transform: translate(-50%, 0);} }
+
+/* Coming soon badge */
+.cs-badge{
+  display:inline-block; padding: 4px 12px; border-radius: 99px;
+  background: linear-gradient(135deg, var(--c-orange), var(--c-gold));
+  color:#fff; font-weight:700; font-size: 11px; letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SPLASH SCREEN
+     ============================================================ -->
+<div id="splash">
+  <div class="splash-particles" id="splashParticles"></div>
+  <div class="logo-wrap">
+    <div class="logo-ring"></div>
+    <div class="logo-ring r2"></div>
+    <div class="logo-ring r3"></div>
+    <div class="logo-core">
+      <div class="logo-emoji">☕</div>
+      <div class="logo-text-mini">EST. 2026</div>
+    </div>
+  </div>
+  <div class="splash-title">Mom's Boy Café</div>
+  <div class="splash-sub">Premium Taste Experience</div>
+  <div class="splash-progress"><span></span></div>
+</div>
+
+<!-- ============================================================
+     OFFLINE OVERLAY
+     ============================================================ -->
+<div id="offlineOverlay">
+  <div class="icon">📡</div>
+  <h2 data-i18n="noInternet">No Internet Connection</h2>
+  <p data-i18n="noInternetSub">Please check your network and try again.</p>
+</div>
+
+<!-- ============================================================
+     CAFE CLOSED OVERLAY
+     ============================================================ -->
+<div id="cafeClosedOverlay">
+  <div class="em">😔</div>
+  <h1 data-i18n="cafeClosed">We're Currently Closed</h1>
+  <p id="closedMsg">We sincerely apologize for the inconvenience. We will reopen soon — please check back later.</p>
+  <p style="margin-top:14px;font-size:13px;opacity:.7" id="closedHours">Operating hours: 10:00 AM — 10:00 PM</p>
+</div>
+
+<!-- ============================================================
+     CUSTOMER APP
+     ============================================================ -->
+<div id="customerApp">
+  <header class="c-topbar">
+    <div class="brand">
+      <div class="bcup">☕</div>
+      <div>
+        Mom's Boy Café
+        <small>PREMIUM • SINCE 2026</small>
+      </div>
+    </div>
+    <div class="c-topbar-actions">
+      <div class="cafe-status-pill" id="cafeStatusPill">
+        <span class="dot"></span><span id="cafeStatusText">OPEN</span>
+      </div>
+      <select class="lang-select" id="langSelect">
+        <option value="en">English</option>
+        <option value="hi">हिंदी</option>
+        <option value="gu">ગુજરાતી</option>
+        <option value="mr">मराठी</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="positive-banner">
+    <div class="track">
+      <span>✨ <span data-i18n="pos1">We always serve fresh food</span></span>
+      <span>🌿 <span data-i18n="pos2">We always use fresh products</span></span>
+      <span>⚡ <span data-i18n="pos3">Lightning fast delivery</span></span>
+      <span>👨‍🍳 <span data-i18n="pos4">Made with love by Mom's Boys</span></span>
+      <span>🏆 <span data-i18n="pos5">Trusted by thousands</span></span>
+      <span>✨ <span data-i18n="pos1">We always serve fresh food</span></span>
+      <span>🌿 <span data-i18n="pos2">We always use fresh products</span></span>
+    </div>
+  </div>
+
+  <main class="c-main">
+
+    <!-- INFO SCREEN -->
+    <section class="screen active" id="screen-info">
+      <div class="info-card">
+        <h2 data-i18n="welcome">Welcome to Mom's Boy Café</h2>
+        <div class="sub" data-i18n="welcomeSub">Please share your details so we can deliver fresh & hot to your door.</div>
+        <div class="field">
+          <label data-i18n="fName">Full Name</label>
+          <input type="text" id="custName" placeholder="John Doe" />
+        </div>
+        <div class="field">
+          <label data-i18n="fMobile">Mobile Number</label>
+          <input type="tel" id="custMobile" placeholder="10-digit mobile number" maxlength="10" />
+        </div>
+        <div class="field">
+          <label data-i18n="fAddress">Delivery Address</label>
+          <textarea id="custAddress" placeholder="House/flat no., street, area, city, pincode"></textarea>
+        </div>
+        <div class="location-row">
+          <button class="btn ghost" onclick="getLiveLocation()">📍 <span data-i18n="useLoc">Use My Current Location</span></button>
+          <button class="btn gold" onclick="proceedFromInfo()"><span data-i18n="continue">Continue</span> →</button>
+        </div>
+        <div class="map-preview" id="mapPreview">
+          <div class="map-pin">📍</div>
+          <div class="map-coords" id="mapCoords" data-i18n="locDenied">Location not yet shared — Tap "Use My Current Location"</div>
+        </div>
+        <p style="margin-top:10px; font-size:11.5px; color:var(--c-muted)" data-i18n="locReq">⚠️ Live location access is mandatory for delivery tracking.</p>
+      </div>
+    </section>
+
+    <!-- CHOICE SCREEN -->
+    <section class="screen" id="screen-choice">
+      <div class="welcome-hero">
+        <h1><span data-i18n="hi">Hi</span>, <span class="hey" id="custNameDisp">Friend</span>! 👋</h1>
+        <p data-i18n="howServe">How can we serve you today?</p>
+      </div>
+      <div class="choice-grid">
+        <div class="choice-card" onclick="openMenu()">
+          <div class="icon">🍕</div>
+          <h3 data-i18n="orderOnline">Order Food Online</h3>
+          <p data-i18n="orderOnlineSub">Browse our menu — pizza, burgers, frankies. Hot & fresh, delivered to your door.</p>
+        </div>
+        <div class="choice-card" onclick="bookTable()">
+          <div class="icon">🎉</div>
+          <h3 data-i18n="bookTable">Book Table for Special Events</h3>
+          <p data-i18n="bookTableSub">Birthdays, anniversaries, gatherings — reserve a memorable evening.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU SCREEN -->
+    <section class="screen" id="screen-menu">
+      <button class="back-btn" onclick="showScreen('choice')">← <span data-i18n="back">Back</span></button>
+      <h2 class="section-title">🍽️ <span data-i18n="ourMenu">Our Menu</span></h2>
+      <div class="cat-tabs" id="catTabs"></div>
+      <div class="menu-grid" id="menuGrid"></div>
+    </section>
+
+    <!-- CART SCREEN -->
+    <section class="screen" id="screen-cart">
+      <button class="back-btn" onclick="showScreen('menu')">← <span data-i18n="back">Back</span></button>
+      <h2 class="section-title">🛒 <span data-i18n="yourCart">Your Cart</span></h2>
+      <div id="cartContent"></div>
+    </section>
+
+    <!-- TRACKING SCREEN -->
+    <section class="screen" id="screen-track">
+      <h2 class="section-title">📦 <span data-i18n="trackOrder">Track Your Order</span></h2>
+      <div id="trackContent"></div>
+    </section>
+
+  </main>
+
+  <!-- Floating cart -->
+  <button class="fab-cart" id="fabCart" onclick="showScreen('cart')" style="display:none;">
+    🛒 <span class="count" id="cartCount">0</span>
+    <span data-i18n="viewCart">View Cart</span>
+    <span>• ₹<span id="cartTotalFab">0</span></span>
+  </button>
+
+  <footer class="app-footer">
+    This System Powered by <a href="https://bentzen.site/" target="_blank" rel="noopener">Bentzen</a> © Copyright 2026
+  </footer>
+</div>
+
+<!-- ============================================================
+     ADMIN LOGIN
+     ============================================================ -->
+<div id="adminLogin">
+  <div class="login-card" id="loginCard">
+    <div class="lg-logo">☕</div>
+    <h2>Admin Panel</h2>
+    <div class="ltag">Mom's Boy Café</div>
+    <div class="afield">
+      <label>Username</label>
+      <input id="loginUser" type="text" autocomplete="off" placeholder="bentzen" />
+    </div>
+    <div class="afield">
+      <label>Password</label>
+      <input id="loginPass" type="password" autocomplete="off" placeholder="••••" />
+    </div>
+    <div class="afield" id="refIdField" style="display:none;">
+      <label>Reference ID <span style="color:var(--a-red)">*</span></label>
+      <input id="loginRef" type="text" autocomplete="off" placeholder="6-digit reference ID" />
+      <p style="font-size:11px;color:var(--a-muted);margin-top:6px">New device detected. Enter reference ID to authorize.</p>
+    </div>
+    <button class="btn" onclick="doAdminLogin()">🔐 Secure Login</button>
+    <div class="err" id="loginErr"></div>
+    <div class="hint">For authorized personnel only.<br/>Customer site: <a href="#" onclick="goCustomer();return false;" style="color:var(--a-gold2)">← Back to Café</a></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADMIN APP
+     ============================================================ -->
+<div id="adminApp">
+  <div class="admin-bg"></div>
+  <div class="flash-alert" id="flashAlert"></div>
+  <div class="admin-shell">
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="lg">☕</div>
+        <div>
+          <h2>Admin Panel</h2>
+          <small>MOM'S BOY CAFÉ</small>
+        </div>
+      </div>
+      <nav id="adminNav">
+        <div class="nav-item active" data-sec="dashboard"><span class="ic">📊</span> Dashboard</div>
+        <div class="nav-item" data-sec="liveOrders"><span class="ic">🔔</span> Live Orders <span class="badge" id="liveOrdersBadge" style="display:none">0</span></div>
+        <div class="nav-item" data-sec="orderHistory"><span class="ic">📜</span> Order History</div>
+        <div class="nav-item" data-sec="payHistory"><span class="ic">💳</span> Payment History</div>
+        <div class="nav-item" data-sec="menuMgmt"><span class="ic">🍽️</span> Menu Management</div>
+        <div class="nav-item" data-sec="catMgmt"><span class="ic">📂</span> Categories</div>
+        <div class="nav-item" data-sec="cafeSettings"><span class="ic">⚙️</span> Café Settings</div>
+        <div class="nav-item" data-sec="staffMgmt"><span class="ic">🛵</span> Delivery Staff</div>
+        <div class="nav-item" data-sec="adsMgmt"><span class="ic">📺</span> Advertisements</div>
+        <div class="nav-item" data-sec="payInfo"><span class="ic">🏦</span> Payment Info</div>
+        <div class="nav-item" data-sec="reviews"><span class="ic">⭐</span> Reviews</div>
+        <div class="nav-item" data-sec="activity"><span class="ic">📝</span> Activity Log</div>
+      </nav>
+      <div style="margin-top:auto; padding-top:14px; border-top:1px solid var(--a-border); font-size:11px; color:var(--a-muted); text-align:center;">
+        Powered by <a href="https://bentzen.site/" target="_blank" style="color:var(--a-gold2)">Bentzen</a><br>© 2026 v1.0
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1 id="secTitle">Dashboard</h1>
+          <div class="sub" id="secSub">Real-time overview of café operations</div>
+        </div>
+        <div class="search-box">
+          <span>🔍</span>
+          <input id="globalSearch" placeholder="Search in this section..." oninput="globalSearchHandler()" />
+        </div>
+        <button class="logout-btn" onclick="adminLogout()">⏻ Logout</button>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="section active" data-sec="dashboard">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="ic">📦</div><div class="lbl">Today's Orders</div><div class="val" id="kpiOrders">0</div></div>
+          <div class="kpi"><div class="ic">💰</div><div class="lbl">Today's Revenue</div><div class="val">₹<span id="kpiRevenue">0</span></div></div>
+          <div class="kpi"><div class="ic">⏳</div><div class="lbl">Pending</div><div class="val" id="kpiPending">0</div></div>
+          <div class="kpi"><div class="ic">⭐</div><div class="lbl">Avg Rating</div><div class="val" id="kpiRating">5.0</div></div>
+          <div class="kpi"><div class="ic">🍕</div><div class="lbl">Menu Items</div><div class="val" id="kpiMenu">0</div></div>
+          <div class="kpi"><div class="ic">🛵</div><div class="lbl">Staff</div><div class="val" id="kpiStaff">0</div></div>
+        </div>
+        <div class="panel">
+          <h3>🚀 Quick Status</h3>
+          <div class="row-flex">
+            <div>
+              <div style="font-size:12px;color:var(--a-muted);text-transform:uppercase;letter-spacing:1px;">Café Status</div>
+              <div style="margin-top:4px"><span class="tag" id="dashCafeStatus">●</span></div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:var(--a-muted);text-transform:uppercase;letter-spacing:1px;">Operating Hours</div>
+              <div style="margin-top:4px; font-weight:600" id="dashHours">10:00 — 22:00</div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:var(--a-muted);text-transform:uppercase;letter-spacing:1px;">Today's Counter</div>
+              <div style="margin-top:4px; font-weight:600">Order #<span id="dashCounter">0</span></div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:var(--a-muted);text-transform:uppercase;letter-spacing:1px;">Data Retention</div>
+              <div style="margin-top:4px; font-weight:600">2 Years Secured 🔒</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>📈 Recent Orders</h3>
+          <div id="recentOrders"></div>
+        </div>
+      </div>
+
+      <!-- LIVE ORDERS -->
+      <div class="section" data-sec="liveOrders">
+        <div class="panel">
+          <h3>🔔 Active Orders</h3>
+          <div id="liveOrdersList"></div>
+        </div>
+      </div>
+
+      <!-- ORDER HISTORY -->
+      <div class="section" data-sec="orderHistory">
+        <div class="panel">
+          <h3>📜 Complete Order History</h3>
+          <div class="scroll-x">
+            <table class="tbl" id="orderHistoryTbl">
+              <thead>
+                <tr>
+                  <th>Order #</th><th>Date/Time</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAY HISTORY -->
+      <div class="section" data-sec="payHistory">
+        <div class="panel">
+          <h3>💳 Payment History</h3>
+          <div class="scroll-x">
+            <table class="tbl" id="payHistoryTbl">
+              <thead>
+                <tr>
+                  <th>Txn Time</th><th>Order #</th><th>Customer</th><th>Method</th><th>Amount</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MENU MGMT -->
+      <div class="section" data-sec="menuMgmt">
+        <div class="panel">
+          <h3>🍽️ Menu Management</h3>
+          <p style="color:var(--a-muted); font-size:13px; margin-bottom:14px">Toggle availability, edit prices, or remove items. Changes sync instantly to the customer panel.</p>
+          <div class="row-flex" style="margin-bottom:14px">
+            <select id="newItemCat" class="afield" style="width:auto"></select>
+            <input id="newItemName" placeholder="Item name" style="flex:1; min-width:140px" class="afield" />
+            <input id="newItemPrice" type="number" placeholder="Price" style="width:100px" class="afield" />
+            <input id="newItemEmoji" placeholder="🍕" style="width:60px" class="afield" />
+            <input id="newItemDesc" placeholder="Short description" style="flex:1; min-width:160px" class="afield" />
+            <button class="tbtn gold" onclick="addMenuItem()">+ Add Item</button>
+          </div>
+          <div class="scroll-x">
+            <table class="tbl" id="menuMgmtTbl">
+              <thead><tr><th>Item</th><th>Category</th><th>Price (₹)</th><th>Available</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="section" data-sec="catMgmt">
+        <div class="panel">
+          <h3>📂 Categories Management</h3>
+          <div class="row-flex" style="margin-bottom:14px">
+            <input id="newCatName" placeholder="Category name" class="afield" style="flex:1; min-width:140px" />
+            <input id="newCatIcon" placeholder="🍔" class="afield" style="width:80px" />
+            <button class="tbtn gold" onclick="addCategory()">+ Add Category</button>
+          </div>
+          <div id="catList"></div>
+        </div>
+      </div>
+
+      <!-- CAFE SETTINGS -->
+      <div class="section" data-sec="cafeSettings">
+        <div class="panel">
+          <h3>⚙️ Café Settings</h3>
+          <div class="aforms-grid">
+            <div class="afield">
+              <label>Café Status</label>
+              <div class="row-flex">
+                <div class="toggle" id="toggleCafe" onclick="toggleCafeOpen()"></div>
+                <span id="cafeOpenLbl">Open</span>
+              </div>
+            </div>
+            <div class="afield">
+              <label>Open Time</label>
+              <input type="time" id="openTime" onchange="updateHours()" />
+            </div>
+            <div class="afield">
+              <label>Close Time</label>
+              <input type="time" id="closeTime" onchange="updateHours()" />
+            </div>
+          </div>
+          <div class="afield">
+            <label>Custom Closed Message (shown to customers when café is closed)</label>
+            <textarea id="closedMessage" placeholder="We are closed for the day. Sorry for the inconvenience — we will reopen tomorrow morning."></textarea>
+          </div>
+          <button class="btn gold" onclick="saveCafeSettings()">💾 Save Settings</button>
+        </div>
+        <div class="panel">
+          <h3>🌍 Multi-day Closure</h3>
+          <div class="afield">
+            <label>Reason / Message for Extended Closure</label>
+            <textarea id="extendedMsg" placeholder="Closed for Diwali holidays. Reopening on Nov 5."></textarea>
+          </div>
+          <p style="font-size:12px;color:var(--a-muted)">Tip: Toggle "Café Status" off and set this message to inform customers of multi-day closure.</p>
+        </div>
+      </div>
+
+      <!-- DELIVERY STAFF -->
+      <div class="section" data-sec="staffMgmt">
+        <div class="panel">
+          <h3>🛵 Delivery Staff</h3>
+          <div class="row-flex" style="margin-bottom:14px">
+            <input id="newStaffName" placeholder="Staff name" class="afield" style="flex:1;min-width:160px" />
+            <input id="newStaffPhone" placeholder="Phone number" class="afield" style="flex:1;min-width:140px" />
+            <button class="tbtn gold" onclick="addStaff()">+ Add Staff</button>
+          </div>
+          <div id="staffList"></div>
+        </div>
+      </div>
+
+      <!-- ADS MGMT -->
+      <div class="section" data-sec="adsMgmt">
+        <div class="panel">
+          <h3>📺 Advertisement Management</h3>
+          <p style="color:var(--a-muted); font-size:13px; margin-bottom:14px">Run live image or video ads on the customer panel. They appear as smooth popups with a close button.</p>
+          <div class="aforms-grid">
+            <div class="afield">
+              <label>Ad Type</label>
+              <select id="adType"><option value="image">Image</option><option value="video">Video</option></select>
+            </div>
+            <div class="afield">
+              <label>Media URL</label>
+              <input id="adUrl" placeholder="https://example.com/poster.jpg" />
+            </div>
+            <div class="afield">
+              <label>Caption</label>
+              <input id="adCaption" placeholder="Today's Special: 20% off Pizza!" />
+            </div>
+            <div class="afield">
+              <label>Auto-Close Duration (seconds, 0 = no auto)</label>
+              <input id="adDuration" type="number" min="0" value="8" />
+            </div>
+          </div>
+          <div class="row-flex">
+            <button class="btn gold" onclick="saveAd()">💾 Save Ad</button>
+            <div class="row-flex">
+              <div class="toggle" id="toggleAd" onclick="toggleAd()"></div>
+              <span id="adStatusLbl">Disabled</span>
+            </div>
+            <button class="tbtn blue" onclick="previewAd()">👁️ Preview on Customer Side</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAY INFO -->
+      <div class="section" data-sec="payInfo">
+        <div class="panel">
+          <h3>🏦 Payment Information</h3>
+          <div class="aforms-grid">
+            <div class="afield">
+              <label>UPI ID (linked to owner's bank account)</label>
+              <input id="upiId" />
+            </div>
+            <div class="afield">
+              <label>QR Code Image URL</label>
+              <input id="qrUrl" />
+            </div>
+          </div>
+          <button class="btn gold" onclick="savePayInfo()">💾 Save Payment Info</button>
+          <div style="margin-top:18px; text-align:center;">
+            <img id="adminQrImg" src="" style="max-width:240px; border-radius:14px; border:2px dashed var(--a-gold);" />
+            <p style="margin-top:8px; color:var(--a-muted); font-size:13px;">Customer-facing QR code preview</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVIEWS -->
+      <div class="section" data-sec="reviews">
+        <div class="panel">
+          <h3>⭐ Customer Reviews — Café</h3>
+          <div id="reviewsCafe"></div>
+        </div>
+        <div class="panel">
+          <h3>🛵 Customer Reviews — Delivery Partners</h3>
+          <div id="reviewsDelivery"></div>
+        </div>
+        <div class="panel">
+          <h3>🍕 Item-wise Reviews</h3>
+          <div id="reviewsItems"></div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY LOG -->
+      <div class="section" data-sec="activity">
+        <div class="panel">
+          <h3>📝 Activity Log <span style="font-size:12px;color:var(--a-muted);font-weight:400">(2-year retention)</span></h3>
+          <div id="activityLog"></div>
+        </div>
+      </div>
+
+      <div style="text-align:center; color:var(--a-muted); font-size:12px; padding: 20px 0;">
+        This System Powered by <a href="https://bentzen.site/" target="_blank" style="color:var(--a-gold2)">Bentzen</a> © Copyright 2026
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================
+     GLOBAL MODAL CONTAINER
+     ============================================================ -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<!-- Ad popup -->
+<div id="adPopup">
+  <div class="ad-box">
+    <button class="ad-close" onclick="closeAd()">✕</button>
+    <div id="adBody"></div>
+    <div class="ad-caption" id="adCap"></div>
+  </div>
+</div>
+
+<!-- Print bill area -->
+<div id="printBillArea"></div>
+
+<script>
+/* ============================================================
+   GLOBAL STATE & UTILITIES
+   ============================================================ */
+const LS_KEY = 'momsboy_v1';
+const DEVICE_KEY = 'momsboy_device';
+
+const defaultMenu = {
+  pizza: {
+    label: 'Pizza', icon: '🍕',
+    items: [
+      { id:'p1', name:'Margherita', desc:'Classic mozzarella, tomato, basil', price:199, emoji:'🍕', available:true },
+      { id:'p2', name:'Farmhouse', desc:'Loaded with farm-fresh veggies', price:299, emoji:'🍕', available:true },
+      { id:'p3', name:'Paneer Tikka', desc:'Spicy paneer with onion & capsicum', price:329, emoji:'🍕', available:true },
+      { id:'p4', name:'Cheese Burst', desc:'Molten cheese in every bite', price:349, emoji:'🧀', available:true },
+      { id:'p5', name:'Veggie Supreme', desc:'Olives, jalapeños, corn, peppers', price:279, emoji:'🥬', available:true },
+      { id:'p6', name:'Mexican Wave', desc:'Spicy Mexican blend, bold flavor', price:319, emoji:'🌶️', available:true }
+    ]
+  },
+  burger: {
+    label: 'Burger', icon: '🍔',
+    items: [
+      { id:'b1', name:'Classic Veg', desc:'Crisp patty, lettuce, mayo', price:99, emoji:'🍔', available:true },
+      { id:'b2', name:'Cheese Burger', desc:'Double cheese melt, juicy patty', price:129, emoji:'🧀', available:true },
+      { id:'b3', name:'Aloo Tikki', desc:'Desi aloo patty with chutney', price:89, emoji:'🥔', available:true },
+      { id:'b4', name:'Paneer Burger', desc:'Grilled paneer with herbs', price:149, emoji:'🍔', available:true },
+      { id:'b5', name:'Spicy Bean', desc:'Mexican beans, smoky kick', price:119, emoji:'🌶️', available:true },
+      { id:'b6', name:'Double Decker', desc:'Two patties, ultimate fill', price:179, emoji:'🍔', available:true }
+    ]
+  },
+  frankie: {
+    label: 'Frankie', icon: '🌯',
+    items: [
+      { id:'f1', name:'Veg Frankie', desc:'Mixed veggies in soft roti', price:79, emoji:'🌯', available:true },
+      { id:'f2', name:'Paneer Frankie', desc:'Spicy paneer wrap', price:109, emoji:'🌯', available:true },
+      { id:'f3', name:'Cheese Frankie', desc:'Loaded with melted cheese', price:119, emoji:'🧀', available:true },
+      { id:'f4', name:'Schezwan Frankie', desc:'Indo-Chinese fusion', price:99, emoji:'🌶️', available:true },
+      { id:'f5', name:'Aloo Frankie', desc:'Spicy potato roll', price:69, emoji:'🥔', available:true },
+      { id:'f6', name:'Corn Frankie', desc:'Sweet corn with herbs', price:89, emoji:'🌽', available:true }
+    ]
+  }
+};
+
+const defaultState = {
+  menu: defaultMenu,
+  categoryOrder: ['pizza','burger','frankie'],
+  cafe: {
+    open: true,
+    openTime: '10:00',
+    closeTime: '22:00',
+    closedMessage: 'We sincerely apologize for the inconvenience. We will reopen soon — please check back later.',
+    extendedMsg: ''
+  },
+  payment: {
+    upiId: '8758266787@kotakbank',
+    qrUrl: 'https://i.postimg.cc/fWxzszR4/Whats-App-Image-2026-06-24-at-4-21-20-PM.jpg'
+  },
+  ad: { enabled:false, type:'image', url:'', caption:'', duration:8, shownThisSession:false },
+  staff: [
+    { id: genId(), name:'Ramesh Kumar', phone:'9876543210' },
+    { id: genId(), name:'Suresh Patel', phone:'9123456780' }
+  ],
+  orders: [],          // {id, num, customer:{name,mobile,address,lat,lng}, items, total, status, time, payment, deliveryStaff, reviews:{cafe,delivery,items}}
+  payments: [],        // {time, orderId, customer, method, amount, status}
+  activityLog: [],     // {time, action}
+  reviewsItems: {},    // {itemId: [{name, stars, comment, time}]}
+  counter: { date: todayStr(), num: 0 }
+};
+
+function todayStr(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function genId(){ return 'id_' + Math.random().toString(36).slice(2,10); }
+function nowStr(){ const d = new Date(); return d.toLocaleString(); }
+function fmtTime(d){ return new Date(d).toLocaleString(); }
+
+let state = loadState();
+function loadState(){
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_KEY));
+    if (!s) return JSON.parse(JSON.stringify(defaultState));
+    // Cleanup data older than 2 years
+    const twoYearsAgo = Date.now() - 365*24*60*60*1000*2;
+    if (s.orders) s.orders = s.orders.filter(o => o.time > twoYearsAgo);
+    if (s.payments) s.payments = s.payments.filter(p => p.time > twoYearsAgo);
+    if (s.activityLog) s.activityLog = s.activityLog.filter(a => a.time > twoYearsAgo);
+    // Merge missing fields
+    const merged = JSON.parse(JSON.stringify(defaultState));
+    Object.assign(merged, s);
+    if (!s.menu) merged.menu = defaultMenu;
+    return merged;
+  } catch(e){ return JSON.parse(JSON.stringify(defaultState)); }
+}
+function saveState(){
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+  // Broadcast (same-tab and cross-tab)
+  try { window.dispatchEvent(new Event('momsboy:update')); } catch(e){}
+}
+window.addEventListener('storage', (e)=>{ if(e.key===LS_KEY){ state = loadState(); refreshAll(); } });
+window.addEventListener('momsboy:update', ()=>{ refreshAll(); });
+
+/* Daily counter reset */
+function nextOrderNumber(){
+  const t = todayStr();
+  if (state.counter.date !== t){ state.counter = { date: t, num: 0 }; }
+  state.counter.num += 1;
+  saveState();
+  return state.counter.num;
+}
+
+/* Activity log */
+function logActivity(action){
+  state.activityLog.unshift({ time: Date.now(), action });
+  if (state.activityLog.length > 5000) state.activityLog.length = 5000;
+  saveState();
+}
+
+/* Toast */
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=> t.remove(), 2400);
+}
+
+/* ============================================================
+   TRANSLATIONS
+   ============================================================ */
+const I18N = {
+  en: {
+    welcome: "Welcome to Mom's Boy Café", welcomeSub: "Please share your details so we can deliver fresh & hot to your door.",
+    fName:"Full Name", fMobile:"Mobile Number", fAddress:"Delivery Address",
+    useLoc:"Use My Current Location", continue:"Continue", locReq:"⚠️ Live location access is mandatory for delivery tracking.",
+    locDenied:'Location not yet shared — Tap "Use My Current Location"',
+    hi:"Hi", howServe:"How can we serve you today?",
+    orderOnline:"Order Food Online", orderOnlineSub:"Browse our menu — pizza, burgers, frankies. Hot & fresh, delivered to your door.",
+    bookTable:"Book Table for Special Events", bookTableSub:"Birthdays, anniversaries, gatherings — reserve a memorable evening.",
+    back:"Back", ourMenu:"Our Menu", yourCart:"Your Cart", trackOrder:"Track Your Order", viewCart:"View Cart",
+    pos1:"We always serve fresh food", pos2:"We always use fresh products", pos3:"Lightning fast delivery",
+    pos4:"Made with love by Mom's Boys", pos5:"Trusted by thousands",
+    noInternet:"No Internet Connection", noInternetSub:"Please check your network and try again.",
+    cafeClosed:"We're Currently Closed"
+  },
+  hi: {
+    welcome:"मॉम्स बॉय कैफे में स्वागत है", welcomeSub:"कृपया अपनी जानकारी साझा करें ताकि हम ताज़ा खाना आपके दरवाजे तक पहुँचा सकें।",
+    fName:"पूरा नाम", fMobile:"मोबाइल नंबर", fAddress:"डिलीवरी पता",
+    useLoc:"मेरा वर्तमान स्थान उपयोग करें", continue:"आगे बढ़ें", locReq:"⚠️ डिलीवरी ट्रैकिंग के लिए स्थान साझा करना अनिवार्य है।",
+    locDenied:'स्थान साझा नहीं किया — "वर्तमान स्थान उपयोग करें" पर टैप करें',
+    hi:"नमस्ते", howServe:"आज हम आपकी कैसे सेवा करें?",
+    orderOnline:"ऑनलाइन ऑर्डर करें", orderOnlineSub:"हमारा मेनू देखें — पिज्जा, बर्गर, फ्रैंकी। ताज़ा और गरम, सीधे आपके घर।",
+    bookTable:"विशेष आयोजन के लिए टेबल बुक करें", bookTableSub:"जन्मदिन, सालगिरह, समारोह — एक यादगार शाम बुक करें।",
+    back:"वापस", ourMenu:"हमारा मेनू", yourCart:"आपकी कार्ट", trackOrder:"ऑर्डर ट्रैक करें", viewCart:"कार्ट देखें",
+    pos1:"हम हमेशा ताज़ा खाना परोसते हैं", pos2:"हम हमेशा ताज़ा सामग्री उपयोग करते हैं", pos3:"बिजली जैसी तेज़ डिलीवरी",
+    pos4:"मॉम्स बॉयज़ द्वारा प्यार से बनाया गया", pos5:"हज़ारों ग्राहकों का भरोसा",
+    noInternet:"इंटरनेट कनेक्शन नहीं", noInternetSub:"कृपया अपना नेटवर्क जांचें और पुनः प्रयास करें।",
+    cafeClosed:"हम अभी बंद हैं"
+  },
+  gu: {
+    welcome:"મોમ્સ બોય કાફેમાં આપનું સ્વાગત છે", welcomeSub:"કૃપા કરીને તમારી માહિતી શેર કરો જેથી અમે તાજું ભોજન તમારા ઘરે પહોંચાડી શકીએ.",
+    fName:"પૂરું નામ", fMobile:"મોબાઇલ નંબર", fAddress:"ડિલિવરી સરનામું",
+    useLoc:"મારું વર્તમાન સ્થાન વાપરો", continue:"ચાલુ રાખો", locReq:"⚠️ ડિલિવરી ટ્રેકિંગ માટે સ્થાન શેર કરવું ફરજિયાત છે.",
+    locDenied:'સ્થાન શેર નથી થયું — "વર્તમાન સ્થાન વાપરો" પર ટૅપ કરો',
+    hi:"નમસ્તે", howServe:"આજે અમે કેવી રીતે મદદ કરી શકીએ?",
+    orderOnline:"ઓનલાઇન ઓર્ડર કરો", orderOnlineSub:"અમારો મેન્યુ જુઓ — પિઝા, બર્ગર, ફ્રેન્કી. તાજું અને ગરમ.",
+    bookTable:"વિશેષ પ્રસંગ માટે ટેબલ બુક કરો", bookTableSub:"જન્મદિવસ, વર્ષગાંઠ, મેળાવડા — એક યાદગાર સાંજ બુક કરો.",
+    back:"પાછળ", ourMenu:"અમારો મેન્યુ", yourCart:"તમારી કાર્ટ", trackOrder:"ઓર્ડર ટ્રેક કરો", viewCart:"કાર્ટ જુઓ",
+    pos1:"અમે હંમેશા તાજું ભોજન પીરસીએ છીએ", pos2:"અમે હંમેશા તાજી સામગ્રી વાપરીએ છીએ", pos3:"વીજળી જેવી ઝડપી ડિલિવરી",
+    pos4:"મોમ્સ બોય્ઝ દ્વારા પ્રેમથી બનાવેલ", pos5:"હજારોનો વિશ્વાસ",
+    noInternet:"ઇન્ટરનેટ કનેક્શન નથી", noInternetSub:"કૃપા કરીને નેટવર્ક તપાસો અને ફરી પ્રયત્ન કરો.",
+    cafeClosed:"અમે હાલમાં બંધ છીએ"
+  },
+  mr: {
+    welcome:"मॉम्स बॉय कॅफेमध्ये आपले स्वागत आहे", welcomeSub:"कृपया तुमची माहिती शेअर करा जेणेकरून आम्ही ताजे जेवण तुमच्या दारी पोहोचवू शकू.",
+    fName:"पूर्ण नाव", fMobile:"मोबाइल नंबर", fAddress:"डिलिव्हरी पत्ता",
+    useLoc:"माझे सध्याचे स्थान वापरा", continue:"पुढे जा", locReq:"⚠️ डिलिव्हरी ट्रॅकिंगसाठी स्थान शेअर करणे आवश्यक आहे.",
+    locDenied:'स्थान शेअर केले नाही — "सध्याचे स्थान वापरा" वर टॅप करा',
+    hi:"नमस्कार", howServe:"आज आम्ही तुमची कशी सेवा करू?",
+    orderOnline:"ऑनलाइन ऑर्डर करा", orderOnlineSub:"आमचा मेनू पहा — पिझ्झा, बर्गर, फ्रँकी. ताजे आणि गरम.",
+    bookTable:"विशेष कार्यक्रमासाठी टेबल बुक करा", bookTableSub:"वाढदिवस, वर्धापन दिन, मेळावे — एक संस्मरणीय संध्याकाळ बुक करा.",
+    back:"मागे", ourMenu:"आमचा मेनू", yourCart:"तुमची कार्ट", trackOrder:"ऑर्डर ट्रॅक करा", viewCart:"कार्ट पहा",
+    pos1:"आम्ही नेहमी ताजे जेवण देतो", pos2:"आम्ही नेहमी ताजे साहित्य वापरतो", pos3:"विजेसारखी जलद डिलिव्हरी",
+    pos4:"मॉम्स बॉईजने प्रेमाने बनवले", pos5:"हजारोंचा विश्वास",
+    noInternet:"इंटरनेट कनेक्शन नाही", noInternetSub:"कृपया तुमचे नेटवर्क तपासा आणि पुन्हा प्रयत्न करा.",
+    cafeClosed:"आम्ही सध्या बंद आहोत"
+  }
+};
+
+let currentLang = localStorage.getItem('momsboy_lang') || 'en';
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    const v = I18N[currentLang] && I18N[currentLang][k];
+    if (v) el.textContent = v;
+  });
+}
+
+/* ============================================================
+   SPLASH PARTICLES
+   ============================================================ */
+(function(){
+  const wrap = document.getElementById('splashParticles');
+  for (let i=0;i<25;i++){
+    const s = document.createElement('span');
+    s.style.left = (Math.random()*100)+'%';
+    s.style.animationDuration = (5+Math.random()*8)+'s';
+    s.style.animationDelay = (Math.random()*4)+'s';
+    s.style.width = s.style.height = (4+Math.random()*8)+'px';
+    wrap.appendChild(s);
+  }
+})();
+
+/* ============================================================
+   ROUTING (#admin)
+   ============================================================ */
+function checkRoute(){
+  if (location.hash === '#admin'){ showAdminFlow(); }
+  else { showCustomerFlow(); }
+}
+window.addEventListener('hashchange', checkRoute);
+
+function showCustomerFlow(){
+  document.getElementById('adminLogin').classList.remove('show');
+  document.getElementById('adminApp').classList.remove('show');
+  document.getElementById('customerApp').classList.add('show');
+  refreshCustomer();
+}
+function showAdminFlow(){
+  document.getElementById('customerApp').classList.remove('show');
+  if (sessionStorage.getItem('momsboy_admin_in') === '1'){
+    enterAdmin();
+  } else {
+    document.getElementById('adminApp').classList.remove('show');
+    document.getElementById('adminLogin').classList.add('show');
+    // Check device recognition
+    const known = localStorage.getItem(DEVICE_KEY);
+    document.getElementById('refIdField').style.display = known ? 'none' : 'block';
+  }
+}
+function goCustomer(){ location.hash = ''; }
+function adminLogout(){
+  sessionStorage.removeItem('momsboy_admin_in');
+  location.hash = '';
+}
+
+/* ============================================================
+   SPLASH → CUSTOMER
+   ============================================================ */
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('hide');
+    checkRoute();
+    applyLang();
+    document.getElementById('langSelect').value = currentLang;
+    checkCafeStatus();
+    setInterval(checkCafeStatus, 30000);
+    maybeShowAd();
+  }, 2800);
+});
+
+document.getElementById('langSelect').addEventListener('change', e=>{
+  currentLang = e.target.value;
+  localStorage.setItem('momsboy_lang', currentLang);
+  applyLang();
+});
+
+/* Online/Offline */
+function updateOnline(){
+  document.getElementById('offlineOverlay').classList.toggle('show', !navigator.onLine);
+}
+window.addEventListener('online', updateOnline);
+window.addEventListener('offline', updateOnline);
+updateOnline();
+
+/* ============================================================
+   CAFÉ STATUS
+   ============================================================ */
+function isWithinHours(){
+  const [oh,om] = state.cafe.openTime.split(':').map(Number);
+  const [ch,cm] = state.cafe.closeTime.split(':').map(Number);
+  const now = new Date();
+  const cur = now.getHours()*60 + now.getMinutes();
+  const open = oh*60+om, close = ch*60+cm;
+  if (open <= close) return cur >= open && cur < close;
+  return cur >= open || cur < close; // overnight
+}
+function effectivelyOpen(){
+  return state.cafe.open && isWithinHours();
+}
+function checkCafeStatus(){
+  const pill = document.getElementById('cafeStatusPill');
+  const text = document.getElementById('cafeStatusText');
+  const overlay = document.getElementById('cafeClosedOverlay');
+  const msg = document.getElementById('closedMsg');
+  const hrs = document.getElementById('closedHours');
+  if (effectivelyOpen()){
+    pill.classList.remove('closed'); text.textContent = 'OPEN';
+    overlay.classList.remove('show');
+  } else {
+    pill.classList.add('closed'); text.textContent = 'CLOSED';
+    let m = state.cafe.closedMessage || 'We are closed. Please come back later.';
+    if (state.cafe.extendedMsg) m = state.cafe.extendedMsg + '\n\n' + m;
+    msg.textContent = m;
+    hrs.textContent = `Operating hours: ${state.cafe.openTime} — ${state.cafe.closeTime}`;
+    overlay.classList.add('show');
+  }
+}
+
+/* ============================================================
+   INFO SCREEN
+   ============================================================ */
+let customer = { name:'', mobile:'', address:'', lat:null, lng:null };
+
+function getLiveLocation(){
+  if (!navigator.geolocation){ alert('Geolocation not supported on this device.'); return; }
+  document.getElementById('mapCoords').textContent = 'Fetching your location...';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    customer.lat = pos.coords.latitude;
+    customer.lng = pos.coords.longitude;
+    document.getElementById('mapCoords').textContent =
+      `📍 Lat: ${customer.lat.toFixed(5)}, Lng: ${customer.lng.toFixed(5)} (accuracy ±${Math.round(pos.coords.accuracy)}m)`;
+    toast('Location captured ✓');
+  }, err=>{
+    document.getElementById('mapCoords').textContent = '❌ Location access denied. Live tracking will not work.';
+    alert('Location access is required for delivery tracking. Please enable location to continue.');
+  }, { enableHighAccuracy:true, timeout:10000 });
+}
+
+function proceedFromInfo(){
+  const n = document.getElementById('custName').value.trim();
+  const m = document.getElementById('custMobile').value.trim();
+  const a = document.getElementById('custAddress').value.trim();
+  if (!n){ alert('Please enter your name.'); return; }
+  if (!/^\d{10}$/.test(m)){ alert('Please enter a valid 10-digit mobile number.'); return; }
+  if (!a){ alert('Please enter your delivery address.'); return; }
+  if (customer.lat === null){
+    if (!confirm('Live location is mandatory for accurate delivery tracking. Continue without location?\n\n(Recommended: Tap "Use My Current Location" first.)')) return;
+  }
+  customer.name = n; customer.mobile = m; customer.address = a;
+  document.getElementById('custNameDisp').textContent = n.split(' ')[0] || 'Friend';
+  showScreen('choice');
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+function showScreen(name){
+  document.querySelectorAll('#customerApp .screen').forEach(s=>s.classList.remove('active'));
+  const t = document.getElementById('screen-'+name);
+  if (t) t.classList.add('active');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function bookTable(){
+  showModal(`
+    <div class="coming-soon">
+      <div class="big-em">🎉</div>
+      <div class="cs-badge">COMING SOON</div>
+      <h3>Table Booking — Launching Soon!</h3>
+      <p>We're crafting an elegant table reservation experience for your special events. Please check back shortly!</p>
+      <button class="btn gold" onclick="closeModal()">Got it</button>
+    </div>
+  `);
+}
+
+/* ============================================================
+   MENU & CART
+   ============================================================ */
+let activeCat = null;
+let cart = []; // {id, name, emoji, price, qty}
+
+function openMenu(){
+  if (!effectivelyOpen()){
+    toast('Café is currently closed.');
+    return;
+  }
+  if (!state.categoryOrder.length){
+    showScreen('menu');
+    document.getElementById('menuGrid').innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--c-muted)">Menu is being updated. Please check back soon.</p>';
+    document.getElementById('catTabs').innerHTML = '';
+    return;
+  }
+  activeCat = state.categoryOrder[0];
+  renderMenu();
+  showScreen('menu');
+}
+
+function renderMenu(){
+  // Tabs
+  const tabsHtml = state.categoryOrder.map(k=>{
+    const c = state.menu[k]; if (!c) return '';
+    return `<button class="cat-tab ${k===activeCat?'active':''}" onclick="setCat('${k}')">${c.icon} ${c.label}</button>`;
+  }).join('');
+  document.getElementById('catTabs').innerHTML = tabsHtml;
+
+  // Items
+  const cat = state.menu[activeCat];
+  if (!cat){ document.getElementById('menuGrid').innerHTML=''; return; }
+  document.getElementById('menuGrid').innerHTML = cat.items.map(item=>{
+    const inCart = cart.find(c=>c.id===item.id);
+    const reviews = (state.reviewsItems[item.id] || []);
+    const avgR = reviews.length ? (reviews.reduce((a,b)=>a+b.stars,0)/reviews.length).toFixed(1) : '5.0';
+    return `
+      <div class="menu-card ${!item.available?'disabled':''}">
+        <div class="thumb">${item.emoji||'🍽️'}</div>
+        <div class="body">
+          <h4>${item.name}</h4>
+          <div class="desc">${item.desc||''}</div>
+          <div class="rating">
+            <span class="stars">${renderStars(avgR)}</span>
+            <span>${avgR} (${reviews.length})</span>
+          </div>
+          <div class="reviews-link" onclick="showItemReviews('${item.id}')">View reviews</div>
+          <div class="pricerow" style="margin-top:8px">
+            <span class="price">₹${item.price}</span>
+            ${!item.available ? '' : (inCart ? renderStepper(item.id, inCart.qty) : `<button class="add-btn" onclick="addToCart('${item.id}')">+ Add</button>`) }
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderStars(avg){
+  const a = parseFloat(avg);
+  let s=''; for (let i=1;i<=5;i++){ s += i<=Math.round(a) ? '★':'☆'; }
+  return s;
+}
+
+function renderStepper(id, qty){
+  return `<div class="qty-stepper">
+    <button onclick="changeQty('${id}',-1)">−</button>
+    <span>${qty}</span>
+    <button onclick="changeQty('${id}',1)">+</button>
+  </div>`;
+}
+
+function setCat(k){ activeCat = k; renderMenu(); }
+
+function findItem(id){
+  for (const k of state.categoryOrder){
+    const it = (state.menu[k]?.items || []).find(i=>i.id===id);
+    if (it) return { item: it, catKey: k };
+  }
+  return null;
+}
+
+function addToCart(id){
+  const f = findItem(id); if (!f || !f.item.available) return;
+  cart.push({ id, name: f.item.name, emoji: f.item.emoji, price: f.item.price, qty: 1 });
+  refreshCart(); renderMenu();
+  bumpCart();
+}
+function changeQty(id, delta){
+  const c = cart.find(x=>x.id===id); if (!c) return;
+  c.qty += delta;
+  if (c.qty <= 0) cart = cart.filter(x=>x.id!==id);
+  refreshCart(); renderMenu();
+}
+function bumpCart(){
+  const f = document.getElementById('fabCart');
+  f.classList.add('bump'); setTimeout(()=>f.classList.remove('bump'), 420);
+}
+function refreshCart(){
+  const fab = document.getElementById('fabCart');
+  const count = cart.reduce((a,b)=>a+b.qty,0);
+  const total = cart.reduce((a,b)=>a+b.qty*b.price,0);
+  document.getElementById('cartCount').textContent = count;
+  document.getElementById('cartTotalFab').textContent = total;
+  fab.style.display = count>0 ? 'flex' : 'none';
+
+  // Cart screen
+  const wrap = document.getElementById('cartContent');
+  if (!count){
+    wrap.innerHTML = `<div class="empty-cart"><div class="em">🛒</div><p>Your cart is empty. Add some delicious items from the menu!</p><br><button class="btn gold" onclick="showScreen('menu')">Browse Menu</button></div>`;
+    return;
+  }
+  const subtotal = total;
+  const delivery = subtotal < 500 ? 30 : 0;
+  const grand = subtotal + delivery;
+  wrap.innerHTML = `
+    <div class="cart-list">
+      ${cart.map(c=>`
+        <div class="cart-item">
+          <div class="ic">${c.emoji||'🍽️'}</div>
+          <div>
+            <div class="name">${c.name}</div>
+            <div class="price-small">₹${c.price} × ${c.qty}</div>
+          </div>
+          <div>${renderStepper(c.id, c.qty)}</div>
+          <button class="remove" onclick="changeQty('${c.id}', -${c.qty})">✕</button>
+        </div>
+      `).join('')}
+    </div>
+    <div class="totals">
+      <div class="row"><span>Subtotal</span><span>₹${subtotal}</span></div>
+      <div class="row"><span>Delivery Fee</span><span>${delivery === 0 ? 'FREE' : '₹'+delivery}</span></div>
+      <div class="row total"><span>Total</span><span>₹${grand}</span></div>
+      <button class="btn gold block" style="margin-top:14px" onclick="confirmOrder()">Place Order — ₹${grand}</button>
+    </div>
+  `;
+}
+
+function showItemReviews(id){
+  const f = findItem(id); if (!f) return;
+  const list = state.reviewsItems[id] || [];
+  const html = list.length ? list.map(r=>`
+    <div style="background:#fff8ef;border-radius:10px;padding:10px;margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between"><b>${r.name}</b><span style="color:#f5b400">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span></div>
+      <div style="font-size:12px;color:var(--c-muted);margin-top:4px">${r.comment||'(no comment)'}</div>
+    </div>
+  `).join('') : '<p>No reviews yet — be the first!</p>';
+  showModal(`
+    <h3>${f.item.emoji} ${f.item.name} — Reviews</h3>
+    ${html}
+    <div class="modal-actions"><button class="btn gold" onclick="closeModal()">Close</button></div>
+  `);
+}
+
+/* ============================================================
+   ORDER PLACE & PAYMENT
+   ============================================================ */
+function confirmOrder(){
+  if (!effectivelyOpen()){ toast('Café is now closed.'); return; }
+  const total = cart.reduce((a,b)=>a+b.qty*b.price,0);
+  const delivery = total < 500 ? 30 : 0;
+  const grand = total + delivery;
+  showModal(`
+    <h3>📝 Confirm Your Order</h3>
+    <p>You're about to place an order for <b>${cart.reduce((a,b)=>a+b.qty,0)} item(s)</b>.</p>
+    <div style="background:#fff8ef;border-radius:12px;padding:12px;margin:8px 0;font-size:13px">
+      ${cart.map(c=>`<div style="display:flex;justify-content:space-between"><span>${c.emoji} ${c.name} × ${c.qty}</span><span>₹${c.price*c.qty}</span></div>`).join('')}
+      <hr style="border:none;border-top:1px dashed #ddd;margin:6px 0"/>
+      <div style="display:flex;justify-content:space-between"><span>Delivery</span><span>${delivery===0?'FREE':'₹'+delivery}</span></div>
+      <div style="display:flex;justify-content:space-between;font-weight:800;font-size:16px;margin-top:4px"><span>Total</span><span>₹${grand}</span></div>
+    </div>
+    <p style="font-size:12px;color:var(--c-muted)">Only online payments are accepted. Cash on Delivery is not available.</p>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn gold" onclick="openPayment()">Yes, Proceed to Pay</button>
+    </div>
+  `);
+}
+
+function openPayment(){
+  closeModal();
+  const total = cart.reduce((a,b)=>a+b.qty*b.price,0);
+  const delivery = total < 500 ? 30 : 0;
+  const grand = total + delivery;
+
+  const apps = [
+    {n:'Google Pay', c:'#4285F4', i:'G'},
+    {n:'PhonePe', c:'#5f259f', i:'P'},
+    {n:'Paytm', c:'#00BAF2', i:'P'},
+    {n:'Amazon Pay', c:'#FF9900', i:'A'},
+    {n:'BHIM UPI', c:'#E76A24', i:'B'},
+    {n:'Kotak811', c:'#EF3E23', i:'K'},
+    {n:'HDFC Bank', c:'#004C8F', i:'H'},
+    {n:'SBI YONO', c:'#22409A', i:'S'},
+    {n:'ICICI iMobile', c:'#F58220', i:'I'},
+    {n:'Axis Mobile', c:'#97144D', i:'A'}
+  ];
+  showModal(`
+    <h3>💳 Choose Payment Method</h3>
+    <p>Amount to pay: <b>₹${grand}</b> — secure direct transfer to café owner's account.</p>
+    <div class="payment-grid">
+      ${apps.map(a=>`
+        <div class="pay-app" onclick="processPayment('${a.n}', ${grand})">
+          <div class="pa-ic" style="background:${a.c}">${a.i}</div>
+          <div class="nm">${a.n}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="upi-card">
+      <div style="font-weight:600;margin-bottom:6px;font-size:13px">Or pay via UPI ID</div>
+      <div class="upi-row">
+        <code id="upiPayCode">${state.payment.upiId}</code>
+        <button class="tbtn gold" onclick="copyUPI()">Copy</button>
+      </div>
+    </div>
+    <div class="qr-card">
+      <div style="font-weight:600;margin-bottom:8px;font-size:13px">📱 Scan QR to Pay</div>
+      <img src="${state.payment.qrUrl}" alt="QR Code" />
+      <div style="margin-top:6px;font-size:11px;color:var(--c-muted)">After paying, tap "I have paid" below</div>
+      <button class="btn gold" style="margin-top:10px" onclick="processPayment('UPI QR', ${grand})">I have paid ✓</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+}
+
+function copyUPI(){
+  navigator.clipboard.writeText(state.payment.upiId).then(()=>toast('UPI ID copied ✓'));
+}
+
+function processPayment(method, amount){
+  closeModal();
+  showModal(`
+    <div style="text-align:center;padding:10px 0;">
+      <div class="spinner"></div>
+      <h3>Redirecting to ${method}...</h3>
+      <p>Please complete the payment in the app. Do not close this window.</p>
+    </div>
+  `);
+  setTimeout(()=>{
+    closeModal();
+    finalizeOrder(method, amount);
+  }, 2400);
+}
+
+function finalizeOrder(method, amount){
+  const num = nextOrderNumber();
+  const order = {
+    id: genId(),
+    num,
+    customer: { ...customer },
+    items: cart.map(c=>({ id:c.id, name:c.name, emoji:c.emoji, qty:c.qty, price:c.price })),
+    total: amount,
+    status: 'placed',
+    time: Date.now(),
+    payment: { method, amount, status:'paid', time: Date.now() },
+    deliveryStaff: null,
+    reviews: { cafe:null, delivery:null }
+  };
+  state.orders.unshift(order);
+  state.payments.unshift({ time: Date.now(), orderId: order.id, customer: customer.name, method, amount, status:'paid', orderNum: num });
+  logActivity(`New order #${num} placed by ${customer.name} (₹${amount}) — paid via ${method}`);
+  saveState();
+
+  // Mark new for admin flash
+  localStorage.setItem('momsboy_newOrder', String(Date.now()));
+
+  // Confetti + thank you
+  confetti();
+  showModal(`
+    <div class="thanks">
+      <div class="heart">💖</div>
+      <h2>Thank You from Mom's Boy Café!</h2>
+      <p>Your order <b>#${num}</b> has been received and payment confirmed.</p>
+      <p style="margin-top:8px"><b>Amount paid:</b> ₹${amount} via ${method}</p>
+      <div class="modal-actions">
+        <button class="btn ghost" onclick="downloadBill('${order.id}')">📄 Download Bill</button>
+        <button class="btn gold" onclick="closeModal(); cart=[]; refreshCart(); showTracking('${order.id}');">Track Order →</button>
+      </div>
+    </div>
+  `);
+}
+
+function confetti(){
+  const c = document.createElement('div'); c.className='confetti';
+  const colors = ['#e67324','#d4a24a','#f0c674','#27ae60','#2980b9','#c0392b','#ffd98a'];
+  for (let i=0;i<80;i++){
+    const s = document.createElement('span');
+    s.style.left = (Math.random()*100)+'%';
+    s.style.background = colors[Math.floor(Math.random()*colors.length)];
+    s.style.animationDelay = (Math.random()*0.6)+'s';
+    s.style.transform = `rotate(${Math.random()*360}deg)`;
+    c.appendChild(s);
+  }
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(), 4500);
+}
+
+function downloadBill(orderId){
+  const o = state.orders.find(x=>x.id===orderId); if (!o) return;
+  const html = generateBillHTML(o);
+  // Print path
+  document.getElementById('printBillArea').innerHTML = html;
+  // Also offer download as HTML file
+  const blob = new Blob([`<!doctype html><html><head><meta charset="utf-8"><title>Bill #${o.num}</title>
+    <style>body{font-family:Arial;color:#000;padding:30px}h1{font-family:Georgia,serif}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:6px 8px;border-bottom:1px solid #ddd;text-align:left}.r{text-align:right}.tot{font-weight:800;font-size:18px}</style>
+    </head><body>${html}</body></html>`], { type:'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `MomsBoy_Bill_${o.num}.html`; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  toast('Bill downloaded ✓');
+}
+function generateBillHTML(o){
+  return `
+  <h1 style="margin-bottom:4px">Mom's Boy Café</h1>
+  <div style="opacity:.7;font-size:13px">Tax Invoice / Bill</div>
+  <hr style="margin:10px 0"/>
+  <div style="display:flex;justify-content:space-between;flex-wrap:wrap">
+    <div>
+      <b>Bill To:</b><br/>${o.customer.name}<br/>${o.customer.mobile}<br/>${o.customer.address}
+    </div>
+    <div style="text-align:right">
+      <b>Order No:</b> #${o.num}<br/>
+      <b>Date:</b> ${fmtTime(o.time)}<br/>
+      <b>Payment:</b> ${o.payment.method}
+    </div>
+  </div>
+  <table><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Total</th></tr></thead>
+  <tbody>
+    ${o.items.map(i=>`<tr><td>${i.emoji||''} ${i.name}</td><td class="r">${i.qty}</td><td class="r">₹${i.price}</td><td class="r">₹${i.qty*i.price}</td></tr>`).join('')}
+  </tbody></table>
+  <div style="text-align:right;margin-top:10px" class="tot">Total Paid: ₹${o.total}</div>
+  <hr style="margin-top:20px"/>
+  <div style="font-size:12px;opacity:.7;margin-top:8px">UPI: ${state.payment.upiId} • Thank you for ordering from Mom's Boy Café!<br/>
+  Powered by Bentzen © 2026 • https://bentzen.site/</div>
+  `;
+}
+
+/* ============================================================
+   ORDER TRACKING (customer side)
+   ============================================================ */
+let trackedOrderId = null;
+function showTracking(orderId){
+  trackedOrderId = orderId;
+  renderTracking();
+  showScreen('track');
+}
+function renderTracking(){
+  if (!trackedOrderId){ document.getElementById('trackContent').innerHTML='<p>No order to track.</p>'; return; }
+  const o = state.orders.find(x=>x.id===trackedOrderId);
+  if (!o){ document.getElementById('trackContent').innerHTML='<p>Order not found.</p>'; return; }
+  const steps = [
+    {k:'placed', l:'Placed'},
+    {k:'confirmed', l:'Confirmed'},
+    {k:'preparing', l:'Preparing'},
+    {k:'ready', l:'Ready'},
+    {k:'out', l:'Out for Delivery'},
+    {k:'delivered', l:'Delivered'}
+  ];
+  const idx = steps.findIndex(s=>s.k===o.status);
+  const pct = idx<0 ? 0 : (idx/(steps.length-1))*84; // 84% because we span 8%..92%
+
+  const dp = o.deliveryStaff;
+
+  let reviewBlock = '';
+  if (o.status === 'delivered' && !o.reviews.cafe){
+    reviewBlock = `
+      <div class="track-card">
+        <h3 style="font-family:'Playfair Display',serif;color:var(--c-brown)">⭐ Rate Mom's Boy Café</h3>
+        <p style="color:var(--c-muted);font-size:13px">How was the food?</p>
+        <div class="star-input" id="cafeStars">
+          ${[1,2,3,4,5].map(i=>`<span data-v="${i}" onclick="setStars('cafeStars',${i})">★</span>`).join('')}
+        </div>
+        <textarea id="cafeReviewTxt" placeholder="Share your experience..." style="width:100%;padding:10px;border:2px solid #f0e0c8;border-radius:10px;margin-top:8px"></textarea>
+        <button class="btn gold" style="margin-top:8px" onclick="submitCafeReview('${o.id}')">Submit Café Review</button>
+      </div>
+    `;
+  }
+  if (o.status === 'delivered' && o.reviews.cafe && !o.reviews.delivery && o.deliveryStaff){
+    reviewBlock += `
+      <div class="track-card">
+        <h3 style="font-family:'Playfair Display',serif;color:var(--c-brown)">🛵 Rate Delivery Partner</h3>
+        <p style="color:var(--c-muted);font-size:13px">How was the delivery by ${o.deliveryStaff.name}?</p>
+        <div class="star-input" id="dpStars">
+          ${[1,2,3,4,5].map(i=>`<span data-v="${i}" onclick="setStars('dpStars',${i})">★</span>`).join('')}
+        </div>
+        <textarea id="dpReviewTxt" placeholder="Was the delivery fast and friendly?" style="width:100%;padding:10px;border:2px solid #f0e0c8;border-radius:10px;margin-top:8px"></textarea>
+        <button class="btn gold" style="margin-top:8px" onclick="submitDpReview('${o.id}')">Submit Delivery Review</button>
+      </div>
+    `;
+  }
+  if (o.status === 'delivered' && o.reviews.cafe){
+    // Allow per-item reviews
+    reviewBlock += `
+      <div class="track-card">
+        <h3 style="font-family:'Playfair Display',serif;color:var(--c-brown)">🍽️ Review Individual Items</h3>
+        ${o.items.map(it=>`
+          <div style="border-top:1px dashed #eee0c2;padding:10px 0">
+            <div style="font-weight:600;color:var(--c-brown)">${it.emoji} ${it.name}</div>
+            <div class="star-input" id="itemStars_${it.id}">
+              ${[1,2,3,4,5].map(i=>`<span data-v="${i}" onclick="setStars('itemStars_${it.id}',${i})">★</span>`).join('')}
+            </div>
+            <textarea id="itemTxt_${it.id}" placeholder="Quick review..." style="width:100%;padding:8px;border:2px solid #f0e0c8;border-radius:10px;margin-top:6px;font-size:13px"></textarea>
+            <button class="tbtn gold" style="margin-top:6px" onclick="submitItemReview('${it.id}','${o.id}')">Submit</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  document.getElementById('trackContent').innerHTML = `
+    <div class="track-card">
+      <div class="order-num-badge">ORDER #${o.num}</div>
+      <div style="color:var(--c-muted);font-size:13px;margin-top:4px">Placed at ${fmtTime(o.time)}</div>
+      <div class="steps">
+        <div class="progress-line" style="width:${pct}%"></div>
+        ${steps.map((s,i)=>`<div class="step ${i<=idx?'done':''}"><div class="dot">${i<=idx?'✓':i+1}</div><div class="label">${s.l}</div></div>`).join('')}
+      </div>
+    </div>
+    ${dp ? `
+      <div class="track-card">
+        <h3 style="font-family:'Playfair Display',serif;color:var(--c-brown);margin-bottom:10px">🛵 Your Delivery Partner</h3>
+        <div class="delivery-card">
+          <div class="dp-avatar">${dp.name.charAt(0).toUpperCase()}</div>
+          <div class="dp-info">
+            <div class="n">${dp.name}</div>
+            <div class="ph">📞 ${dp.phone}</div>
+          </div>
+          <a class="call-btn" href="tel:${dp.phone}">Call</a>
+        </div>
+        <div class="live-map">
+          <div class="start">🏪</div>
+          <div class="route-line"></div>
+          <div class="rider">🛵</div>
+          <div class="dest">🏠</div>
+        </div>
+        <p style="margin-top:8px;font-size:12px;color:var(--c-muted)">Live tracking is active. Your delivery partner is on the way!</p>
+      </div>
+    ` : (o.status==='out' || o.status==='ready' ? `
+      <div class="track-card">
+        <p>📦 Delivery partner will be assigned shortly...</p>
+      </div>` : '')}
+
+    <div class="track-card">
+      <h3 style="font-family:'Playfair Display',serif;color:var(--c-brown);margin-bottom:8px">📋 Order Summary</h3>
+      ${o.items.map(i=>`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px"><span>${i.emoji} ${i.name} × ${i.qty}</span><span>₹${i.qty*i.price}</span></div>`).join('')}
+      <hr style="border:none;border-top:1px dashed #eee0c2;margin:6px 0"/>
+      <div style="display:flex;justify-content:space-between;font-weight:800;color:var(--c-brown)"><span>Total Paid</span><span>₹${o.total}</span></div>
+      <button class="btn ghost block" style="margin-top:10px" onclick="downloadBill('${o.id}')">📄 Download Bill</button>
+    </div>
+    ${reviewBlock}
+  `;
+}
+
+let starsTemp = {};
+function setStars(elId, v){
+  starsTemp[elId] = v;
+  const el = document.getElementById(elId); if(!el) return;
+  el.querySelectorAll('span').forEach(s=>{
+    s.classList.toggle('on', parseInt(s.dataset.v) <= v);
+  });
+}
+
+function submitCafeReview(orderId){
+  const o = state.orders.find(x=>x.id===orderId); if(!o) return;
+  const stars = starsTemp['cafeStars'] || 5;
+  const text = document.getElementById('cafeReviewTxt').value.trim();
+  o.reviews.cafe = { stars, comment: text, time: Date.now(), customer: o.customer.name };
+  logActivity(`Customer ${o.customer.name} rated café ${stars}★`);
+  saveState();
+  toast('Thanks for your café review ⭐');
+  renderTracking();
+}
+function submitDpReview(orderId){
+  const o = state.orders.find(x=>x.id===orderId); if(!o) return;
+  const stars = starsTemp['dpStars'] || 5;
+  const text = document.getElementById('dpReviewTxt').value.trim();
+  o.reviews.delivery = { stars, comment: text, time: Date.now(), customer: o.customer.name, dp: o.deliveryStaff?.name };
+  logActivity(`Customer ${o.customer.name} rated delivery partner ${o.deliveryStaff?.name} ${stars}★`);
+  saveState();
+  toast('Thanks for rating the delivery ⭐');
+  renderTracking();
+}
+function submitItemReview(itemId, orderId){
+  const o = state.orders.find(x=>x.id===orderId); if(!o) return;
+  const stars = starsTemp['itemStars_'+itemId] || 5;
+  const text = document.getElementById('itemTxt_'+itemId).value.trim();
+  if (!state.reviewsItems[itemId]) state.reviewsItems[itemId] = [];
+  state.reviewsItems[itemId].unshift({ name: o.customer.name, stars, comment: text, time: Date.now() });
+  saveState();
+  toast('Item review submitted ✓');
+}
+
+/* ============================================================
+   MODAL HELPERS
+   ============================================================ */
+function showModal(html){
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalBackdrop').classList.add('show');
+}
+function closeModal(){ document.getElementById('modalBackdrop').classList.remove('show'); }
+document.getElementById('modalBackdrop').addEventListener('click', e=>{
+  if (e.target.id === 'modalBackdrop') closeModal();
+});
+
+/* ============================================================
+   AD POPUP
+   ============================================================ */
+function maybeShowAd(){
+  if (!state.ad.enabled || !state.ad.url) return;
+  if (sessionStorage.getItem('momsboy_adShown') === '1') return;
+  sessionStorage.setItem('momsboy_adShown', '1');
+  setTimeout(()=>{
+    showAdPopup();
+  }, 4500);
+}
+function showAdPopup(){
+  if (!state.ad.url) return;
+  const body = document.getElementById('adBody');
+  if (state.ad.type === 'video'){
+    body.innerHTML = `<video src="${state.ad.url}" autoplay muted controls playsinline></video>`;
+  } else {
+    body.innerHTML = `<img src="${state.ad.url}" alt="ad" />`;
+  }
+  document.getElementById('adCap').textContent = state.ad.caption || '';
+  document.getElementById('adPopup').classList.add('show');
+  if (state.ad.duration > 0){
+    setTimeout(closeAd, state.ad.duration * 1000);
+  }
+}
+function closeAd(){ document.getElementById('adPopup').classList.remove('show'); }
+function previewAd(){ showAdPopup(); }
+
+/* ============================================================
+   ADMIN: LOGIN
+   ============================================================ */
+function doAdminLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const r = document.getElementById('loginRef').value.trim();
+  const known = localStorage.getItem(DEVICE_KEY);
+  const err = document.getElementById('loginErr');
+  const card = document.getElementById('loginCard');
+
+  if (u !== 'bentzen' || p !== '2026'){
+    err.textContent = '❌ Invalid username or password';
+    card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+    return;
+  }
+  if (!known){
+    if (r !== '123456'){
+      err.textContent = '❌ Invalid reference ID for new device';
+      card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      return;
+    }
+    localStorage.setItem(DEVICE_KEY, genId() + '_' + Date.now());
+    logActivity('New device authorized and added to recognized devices');
+  }
+  sessionStorage.setItem('momsboy_admin_in', '1');
+  err.textContent = '';
+  enterAdmin();
+}
+
+function enterAdmin(){
+  document.getElementById('adminLogin').classList.remove('show');
+  document.getElementById('adminApp').classList.add('show');
+  // Show all data sync
+  toast('Welcome back. Data synchronized ✓');
+  refreshAdmin();
+  setupAdminNav();
+  bindAdminInputs();
+}
+
+/* ============================================================
+   ADMIN: NAVIGATION
+   ============================================================ */
+let currentSec = 'dashboard';
+function setupAdminNav(){
+  document.querySelectorAll('#adminNav .nav-item').forEach(n=>{
+    n.onclick = ()=>{
+      document.querySelectorAll('#adminNav .nav-item').forEach(x=>x.classList.remove('active'));
+      n.classList.add('active');
+      currentSec = n.dataset.sec;
+      document.querySelectorAll('.admin-main .section').forEach(s=>s.classList.remove('active'));
+      document.querySelector(`.admin-main .section[data-sec="${currentSec}"]`).classList.add('active');
+      const titles = {
+        dashboard:['Dashboard','Real-time overview of café operations'],
+        liveOrders:['Live Orders','Active orders awaiting action'],
+        orderHistory:['Order History','All past orders, searchable'],
+        payHistory:['Payment History','All transaction records'],
+        menuMgmt:['Menu Management','Add, edit, disable menu items'],
+        catMgmt:['Categories','Create or remove food categories'],
+        cafeSettings:['Café Settings','Open/closed status, hours, messages'],
+        staffMgmt:['Delivery Staff','Manage delivery team'],
+        adsMgmt:['Advertisements','Run live ads on customer panel'],
+        payInfo:['Payment Info','UPI and QR configuration'],
+        reviews:['Reviews','Customer feedback for café, delivery, items'],
+        activity:['Activity Log','Audit trail of all changes']
+      };
+      document.getElementById('secTitle').textContent = titles[currentSec][0];
+      document.getElementById('secSub').textContent = titles[currentSec][1];
+      document.getElementById('globalSearch').value = '';
+      refreshAdmin();
+    };
+  });
+}
+
+/* ============================================================
+   ADMIN: BIND INPUTS
+   ============================================================ */
+function bindAdminInputs(){
+  document.getElementById('openTime').value = state.cafe.openTime;
+  document.getElementById('closeTime').value = state.cafe.closeTime;
+  document.getElementById('closedMessage').value = state.cafe.closedMessage;
+  document.getElementById('extendedMsg').value = state.cafe.extendedMsg || '';
+  document.getElementById('upiId').value = state.payment.upiId;
+  document.getElementById('qrUrl').value = state.payment.qrUrl;
+  document.getElementById('adType').value = state.ad.type;
+  document.getElementById('adUrl').value = state.ad.url;
+  document.getElementById('adCaption').value = state.ad.caption;
+  document.getElementById('adDuration').value = state.ad.duration;
+
+  document.getElementById('toggleCafe').classList.toggle('on', state.cafe.open);
+  document.getElementById('cafeOpenLbl').textContent = state.cafe.open ? 'Open' : 'Closed';
+  document.getElementById('toggleAd').classList.toggle('on', state.ad.enabled);
+  document.getElementById('adStatusLbl').textContent = state.ad.enabled ? 'Enabled' : 'Disabled';
+
+  // Category select for new item
+  const sel = document.getElementById('newItemCat');
+  sel.innerHTML = state.categoryOrder.map(k=>`<option value="${k}">${state.menu[k].label}</option>`).join('');
+}
+
+/* ============================================================
+   ADMIN: REFRESH ALL SECTIONS
+   ============================================================ */
+function refreshAdmin(){
+  refreshDashboard();
+  refreshLiveOrders();
+  refreshOrderHistory();
+  refreshPayHistory();
+  refreshMenuMgmt();
+  refreshCategories();
+  refreshStaffList();
+  refreshReviews();
+  refreshActivityLog();
+  refreshAdminQR();
+}
+
+function refreshDashboard(){
+  const today = todayStr();
+  const todayOrders = state.orders.filter(o=> new Date(o.time).toLocaleDateString('en-CA') === today);
+  const revenue = todayOrders.reduce((a,b)=>a+b.total,0);
+  const pending = state.orders.filter(o=> o.status !== 'delivered').length;
+
+  document.getElementById('kpiOrders').textContent = todayOrders.length;
+  document.getElementById('kpiRevenue').textContent = revenue;
+  document.getElementById('kpiPending').textContent = pending;
+  document.getElementById('kpiMenu').textContent = state.categoryOrder.reduce((a,k)=>a + (state.menu[k]?.items.length||0), 0);
+  document.getElementById('kpiStaff').textContent = state.staff.length;
+
+  // Avg rating
+  const allReviews = state.orders.flatMap(o=>{
+    const arr=[]; if(o.reviews?.cafe) arr.push(o.reviews.cafe.stars);
+    return arr;
+  });
+  const avg = allReviews.length ? (allReviews.reduce((a,b)=>a+b,0)/allReviews.length).toFixed(1) : '5.0';
+  document.getElementById('kpiRating').textContent = avg;
+
+  const ds = document.getElementById('dashCafeStatus');
+  ds.textContent = effectivelyOpen() ? '● OPEN' : '● CLOSED';
+  ds.className = 'tag ' + (effectivelyOpen() ? 'ok' : 'bad');
+  document.getElementById('dashHours').textContent = `${state.cafe.openTime} — ${state.cafe.closeTime}`;
+  document.getElementById('dashCounter').textContent = state.counter.date === todayStr() ? state.counter.num : 0;
+
+  const recent = state.orders.slice(0,5);
+  document.getElementById('recentOrders').innerHTML = recent.length ? recent.map(o=>`
+    <div class="list-item">
+      <div>
+        <div style="font-weight:600">Order #${o.num} • ${o.customer.name}</div>
+        <div style="font-size:12px;color:var(--a-muted)">${fmtTime(o.time)} • ₹${o.total}</div>
+      </div>
+      <div><span class="status-badge status-${o.status}">${o.status}</span></div>
+    </div>
+  `).join('') : '<p style="color:var(--a-muted)">No orders yet today.</p>';
+}
+
+function refreshLiveOrders(){
+  const live = state.orders.filter(o=> o.status !== 'delivered');
+  document.getElementById('liveOrdersBadge').style.display = live.length ? 'inline-block' : 'none';
+  document.getElementById('liveOrdersBadge').textContent = live.length;
+
+  const sQ = (currentSec==='liveOrders' ? document.getElementById('globalSearch').value.toLowerCase() : '');
+  const filtered = sQ ? live.filter(o => JSON.stringify(o).toLowerCase().includes(sQ)) : live;
+
+  document.getElementById('liveOrdersList').innerHTML = filtered.length ? filtered.map(o=>`
+    <div class="order-row ${(Date.now()-o.time<60000)?'new':''}">
+      <div><div class="lbl">Order #</div><div class="val">#${o.num}</div></div>
+      <div><div class="lbl">Status</div><div><span class="status-badge status-${o.status}">${o.status}</span></div></div>
+      <div><div class="lbl">Customer</div><div class="val">${o.customer.name}</div></div>
+      <div><div class="lbl">Phone</div><div class="val">📞 ${o.customer.mobile}</div></div>
+      <div class="full"><div class="lbl">Address</div><div class="val">${o.customer.address}${o.customer.lat?` <span style="color:var(--a-muted);font-size:11px">(${o.customer.lat.toFixed(4)}, ${o.customer.lng.toFixed(4)})</span>`:''}</div></div>
+      <div class="full"><div class="lbl">Items</div><div class="items-list">${o.items.map(i=>`${i.emoji} ${i.name} ×${i.qty}`).join(' • ')}</div></div>
+      <div><div class="lbl">Total</div><div class="val">₹${o.total}</div></div>
+      <div><div class="lbl">Time</div><div class="val">${fmtTime(o.time)}</div></div>
+      <div class="full">
+        <div class="lbl">Delivery Partner</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap">
+          <select onchange="assignStaff('${o.id}', this.value)" class="afield" style="margin:0;flex:1;min-width:160px">
+            <option value="">— Assign delivery staff —</option>
+            ${state.staff.map(s=>`<option value="${s.id}" ${o.deliveryStaff?.id===s.id?'selected':''}>${s.name} (${s.phone})</option>`).join('')}
+          </select>
+          ${o.deliveryStaff?`<span class="tag ok">✓ ${o.deliveryStaff.name}</span>`:''}
+        </div>
+      </div>
+      <div class="full">
+        <div class="lbl">Update Status</div>
+        <div class="actions" style="flex-wrap:wrap;margin-top:4px">
+          ${['placed','confirmed','preparing','ready','out','delivered'].map(s=>`<button class="tbtn ${o.status===s?'gold':''}" onclick="updateOrderStatus('${o.id}','${s}')">${s}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('') : '<p style="color:var(--a-muted)">No active orders. New orders will appear here in real-time 🔔</p>';
+}
+
+function refreshOrderHistory(){
+  const sQ = (currentSec==='orderHistory' ? document.getElementById('globalSearch').value.toLowerCase() : '');
+  const list = sQ ? state.orders.filter(o => JSON.stringify(o).toLowerCase().includes(sQ)) : state.orders;
+  document.querySelector('#orderHistoryTbl tbody').innerHTML = list.length ? list.map(o=>`
+    <tr>
+      <td><b>#${o.num}</b></td>
+      <td>${fmtTime(o.time)}</td>
+      <td>${o.customer.name}</td>
+      <td>${o.customer.mobile}</td>
+      <td>${o.items.map(i=>`${i.name}×${i.qty}`).join(', ')}</td>
+      <td>₹${o.total}</td>
+      <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+    </tr>
+  `).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--a-muted)">No orders found.</td></tr>';
+}
+
+function refreshPayHistory(){
+  const sQ = (currentSec==='payHistory' ? document.getElementById('globalSearch').value.toLowerCase() : '');
+  const list = sQ ? state.payments.filter(p=>JSON.stringify(p).toLowerCase().includes(sQ)) : state.payments;
+  document.querySelector('#payHistoryTbl tbody').innerHTML = list.length ? list.map(p=>`
+    <tr>
+      <td>${fmtTime(p.time)}</td>
+      <td>#${p.orderNum||'—'}</td>
+      <td>${p.customer}</td>
+      <td>${p.method}</td>
+      <td>₹${p.amount}</td>
+      <td><span class="tag ok">${p.status}</span></td>
+    </tr>
+  `).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--a-muted)">No payments yet.</td></tr>';
+}
+
+function refreshMenuMgmt(){
+  const sQ = (currentSec==='menuMgmt' ? document.getElementById('globalSearch').value.toLowerCase() : '');
+  const rows = [];
+  state.categoryOrder.forEach(k=>{
+    const c = state.menu[k]; if (!c) return;
+    c.items.forEach(it=>{
+      if (sQ && !(`${it.name} ${c.label} ${it.price}`.toLowerCase().includes(sQ))) return;
+      rows.push(`
+        <tr>
+          <td>${it.emoji} <b>${it.name}</b><br><span style="font-size:11px;color:var(--a-muted)">${it.desc||''}</span></td>
+          <td>${c.label}</td>
+          <td><input type="number" value="${it.price}" onchange="updateItemPrice('${k}','${it.id}',this.value)" style="width:80px;background:rgba(255,255,255,.04);border:1px solid var(--a-border);color:var(--a-text);padding:6px;border-radius:6px"/></td>
+          <td><div class="toggle ${it.available?'on':''}" onclick="toggleItem('${k}','${it.id}')"></div></td>
+          <td class="actions">
+            <button class="tbtn blue" onclick="editItemName('${k}','${it.id}')">✏️ Edit Name</button>
+            <button class="tbtn red" onclick="removeItem('${k}','${it.id}')">🗑️ Remove</button>
+          </td>
+        </tr>
+      `);
+    });
+  });
+  document.querySelector('#menuMgmtTbl tbody').innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5" style="text-align:center;color:var(--a-muted)">No items.</td></tr>';
+}
+
+function refreshCategories(){
+  const sQ = (currentSec==='catMgmt' ? document.getElementById('globalSearch').value.toLowerCase() : '');
+  const items = state.categoryOrder.filter(k=>!sQ || state.menu[k].label.toLowerCase().includes(sQ));
+  document.getElementById('catList').innerHTML = items.map(k=>{
+    const c = state.menu[k];
+    return `
+      <div class="list-item">
+        <div><b>${c.icon} ${c.label}</b><br><span style="font-size:12px;color:var(--a-muted)">${c.items.length} item(s)</span></div>
+        <div class="actions">
+          <button class="tbtn blue" onclick="renameCategory('${k}')">✏️ Rename</button>
+          <button class="tbtn red" onclick="removeCategory('${k}')">🗑️ Remove</button>
+        </div>
+      </div>
+    `;
+  }).join('') || '<p style="color:var(--a-muted)">No categories.</p>';
+}
+
+function refreshStaffList(){
+  const sQ = (currentSec==='staffMgmt' ? document.getElementById('globalSearch').value.toLowerCase() : '');
+  const list = sQ ? state.staff.filter(s=>JSON.stringify(s).toLowerCase().includes(sQ)) : state.staff;
+  document.getElementById('staffList').innerHTML = list.length ? list.map(s=>`
+    <div class="list-item">
+      <div>
+        <div style="font-weight:600">${s.name}</div>
+        <div style="font-size:12px;color:var(--a-muted)">📞 ${s.phone}</div>
+      </div>
+      <div class="actions">
+        <button class="tbtn red" onclick="removeStaff('${s.id}')">🗑️ Remove</button>
+      </div>
+    </div>
+  `).join('') : '<p style="color:var(--a-muted)">No staff added yet.</p>';
+}
+
+function refreshReviews(){
+  const sQ = (currentSec==='reviews' ? document.getElementById('globalSearch').value.toLowerCase() : '');
+  // Café reviews
+  const cafeR = state.orders.filter(o=>o.reviews?.cafe).map(o=>({...o.reviews.cafe, orderNum:o.num}));
+  const dpR = state.orders.filter(o=>o.reviews?.delivery).map(o=>({...o.reviews.delivery, orderNum:o.num}));
+  document.getElementById('reviewsCafe').innerHTML = (sQ ? cafeR.filter(r=>JSON.stringify(r).toLowerCase().includes(sQ)) : cafeR).map(r=>`
+    <div class="review-item">
+      <div class="head"><span class="who">${r.customer} • Order #${r.orderNum}</span><span class="star">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span></div>
+      <div style="font-size:13px;color:var(--a-muted)">${r.comment||'(no comment)'}</div>
+      <div style="font-size:11px;color:var(--a-muted);margin-top:4px">${fmtTime(r.time)}</div>
+    </div>
+  `).join('') || '<p style="color:var(--a-muted)">No café reviews yet.</p>';
+
+  document.getElementById('reviewsDelivery').innerHTML = (sQ ? dpR.filter(r=>JSON.stringify(r).toLowerCase().includes(sQ)) : dpR).map(r=>`
+    <div class="review-item">
+      <div class="head"><span class="who">${r.customer} → ${r.dp} • Order #${r.orderNum}</span><span class="star">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span></div>
+      <div style="font-size:13px;color:var(--a-muted)">${r.comment||'(no comment)'}</div>
+      <div style="font-size:11px;color:var(--a-muted);margin-top:4px">${fmtTime(r.time)}</div>
+    </div>
+  `).join('') || '<p style="color:var(--a-muted)">No delivery reviews yet.</p>';
+
+  // Item reviews
+  let itemBlocks = [];
+  Object.keys(state.reviewsItems).forEach(itemId=>{
+    const f = findItem(itemId); if (!f) return;
+    const list = state.reviewsItems[itemId] || [];
+    const filt = sQ ? list.filter(r=>JSON.stringify(r).toLowerCase().includes(sQ) || f.item.name.toLowerCase().includes(sQ)) : list;
+    if (!filt.length) return;
+    itemBlocks.push(`
+      <div class="review-item" style="background:rgba(245,198,107,.05);border-color:rgba(245,198,107,.25)">
+        <div class="head"><span class="who">${f.item.emoji} ${f.item.name} (${list.length} review${list.length>1?'s':''})</span></div>
+        ${filt.map(r=>`<div style="border-top:1px dashed var(--a-border);padding:6px 0;font-size:13px"><b>${r.name}</b> <span class="star">${'★'.repeat(r.stars)}</span><br><span style="color:var(--a-muted)">${r.comment||''}</span></div>`).join('')}
+      </div>
+    `);
+  });
+  document.getElementById('reviewsItems').innerHTML = itemBlocks.join('') || '<p style="color:var(--a-muted)">No item-wise reviews yet.</p>';
+}
+
+function refreshActivityLog(){
+  const sQ = (currentSec==='activity' ? document.getElementById('globalSearch').value.toLowerCase() : '');
+  const list = sQ ? state.activityLog.filter(a=>a.action.toLowerCase().includes(sQ)) : state.activityLog;
+  document.getElementById('activityLog').innerHTML = list.length ? list.slice(0,200).map(a=>`
+    <div class="log-item">
+      <div class="ts">${fmtTime(a.time)}</div>
+      <div class="ac">${a.action}</div>
+    </div>
+  `).join('') : '<p style="color:var(--a-muted)">No activity recorded yet.</p>';
+}
+
+function refreshAdminQR(){
+  document.getElementById('adminQrImg').src = state.payment.qrUrl;
+}
+
+function globalSearchHandler(){
+  if (currentSec==='liveOrders') refreshLiveOrders();
+  else if (currentSec==='orderHistory') refreshOrderHistory();
+  else if (currentSec==='payHistory') refreshPayHistory();
+  else if (currentSec==='menuMgmt') refreshMenuMgmt();
+  else if (currentSec==='catMgmt') refreshCategories();
+  else if (currentSec==='staffMgmt') refreshStaffList();
+  else if (currentSec==='reviews') refreshReviews();
+  else if (currentSec==='activity') refreshActivityLog();
+}
+
+/* ============================================================
+   ADMIN ACTIONS
+   ============================================================ */
+function toggleCafeOpen(){
+  state.cafe.open = !state.cafe.open;
+  document.getElementById('toggleCafe').classList.toggle('on', state.cafe.open);
+  document.getElementById('cafeOpenLbl').textContent = state.cafe.open ? 'Open' : 'Closed';
+  logActivity(`Café status changed to ${state.cafe.open ? 'OPEN' : 'CLOSED'}`);
+  saveState();
+  checkCafeStatus();
+  refreshDashboard();
+}
+function updateHours(){
+  const ot = document.getElementById('openTime').value;
+  const ct = document.getElementById('closeTime').value;
+  if (ot) state.cafe.openTime = ot;
+  if (ct) state.cafe.closeTime = ct;
+  saveState();
+}
+function saveCafeSettings(){
+  state.cafe.openTime = document.getElementById('openTime').value || state.cafe.openTime;
+  state.cafe.closeTime = document.getElementById('closeTime').value || state.cafe.closeTime;
+  state.cafe.closedMessage = document.getElementById('closedMessage').value;
+  state.cafe.extendedMsg = document.getElementById('extendedMsg').value;
+  logActivity(`Café settings updated (hours: ${state.cafe.openTime}–${state.cafe.closeTime})`);
+  saveState(); checkCafeStatus(); refreshDashboard();
+  toast('Settings saved ✓');
+}
+
+function addMenuItem(){
+  const k = document.getElementById('newItemCat').value;
+  const n = document.getElementById('newItemName').value.trim();
+  const p = parseInt(document.getElementById('newItemPrice').value);
+  const e = document.getElementById('newItemEmoji').value.trim() || '🍽️';
+  const d = document.getElementById('newItemDesc').value.trim();
+  if (!n || !p || !k){ alert('Please fill name, price, and category.'); return; }
+  const id = genId();
+  state.menu[k].items.push({ id, name:n, desc:d, price:p, emoji:e, available:true });
+  logActivity(`Added new menu item "${n}" (₹${p}) to ${state.menu[k].label}`);
+  saveState(); refreshMenuMgmt(); refreshDashboard();
+  document.getElementById('newItemName').value='';
+  document.getElementById('newItemPrice').value='';
+  document.getElementById('newItemDesc').value='';
+  document.getElementById('newItemEmoji').value='';
+  toast('Item added ✓');
+}
+function updateItemPrice(k, id, newPrice){
+  const item = state.menu[k].items.find(i=>i.id===id);
+  if (!item) return;
+  const old = item.price;
+  item.price = parseInt(newPrice)||0;
+  logActivity(`Changed "${item.name}" price: ₹${old} → ₹${item.price}`);
+  saveState();
+}
+function toggleItem(k, id){
+  const item = state.menu[k].items.find(i=>i.id===id);
+  if (!item) return;
+  item.available = !item.available;
+  logActivity(`Item "${item.name}" set to ${item.available?'AVAILABLE':'OUT OF STOCK'}`);
+  saveState(); refreshMenuMgmt();
+}
+function editItemName(k, id){
+  const item = state.menu[k].items.find(i=>i.id===id);
+  const n = prompt('New name:', item.name); if (!n) return;
+  const d = prompt('New description:', item.desc||''); 
+  const e = prompt('New emoji:', item.emoji||'🍽️');
+  item.name = n; if (d!==null) item.desc = d; if (e) item.emoji = e;
+  logActivity(`Edited item: "${item.name}"`);
+  saveState(); refreshMenuMgmt();
+}
+function removeItem(k, id){
+  if (!confirm('Remove this item permanently?')) return;
+  const item = state.menu[k].items.find(i=>i.id===id);
+  state.menu[k].items = state.menu[k].items.filter(i=>i.id!==id);
+  logActivity(`Removed item "${item.name}" from ${state.menu[k].label}`);
+  saveState(); refreshMenuMgmt(); refreshDashboard();
+}
+
+function addCategory(){
+  const n = document.getElementById('newCatName').value.trim();
+  const i = document.getElementById('newCatIcon').value.trim() || '🍽️';
+  if (!n) return;
+  const key = n.toLowerCase().replace(/\s+/g,'_')+'_'+Math.random().toString(36).slice(2,5);
+  state.menu[key] = { label:n, icon:i, items:[] };
+  state.categoryOrder.push(key);
+  logActivity(`New category "${n}" added`);
+  saveState(); bindAdminInputs(); refreshCategories(); refreshMenuMgmt();
+  document.getElementById('newCatName').value=''; document.getElementById('newCatIcon').value='';
+  toast('Category added ✓');
+}
+function renameCategory(k){
+  const c = state.menu[k]; if(!c) return;
+  const n = prompt('New name:', c.label); if (!n) return;
+  const i = prompt('New icon:', c.icon);
+  c.label = n; if (i) c.icon = i;
+  logActivity(`Renamed category to "${n}"`);
+  saveState(); refreshCategories(); bindAdminInputs();
+}
+function removeCategory(k){
+  if (!confirm(`Remove category "${state.menu[k].label}" and all its items?`)) return;
+  logActivity(`Category "${state.menu[k].label}" removed`);
+  delete state.menu[k];
+  state.categoryOrder = state.categoryOrder.filter(x=>x!==k);
+  saveState(); refreshCategories(); bindAdminInputs(); refreshMenuMgmt();
+}
+
+function addStaff(){
+  const n = document.getElementById('newStaffName').value.trim();
+  const p = document.getElementById('newStaffPhone').value.trim();
+  if (!n || !p) return;
+  state.staff.push({ id: genId(), name:n, phone:p });
+  logActivity(`Delivery staff "${n}" added`);
+  saveState(); refreshStaffList(); refreshDashboard();
+  document.getElementById('newStaffName').value=''; document.getElementById('newStaffPhone').value='';
+  toast('Staff added ✓');
+}
+function removeStaff(id){
+  if (!confirm('Remove this staff member?')) return;
+  const s = state.staff.find(x=>x.id===id);
+  state.staff = state.staff.filter(x=>x.id!==id);
+  logActivity(`Staff "${s.name}" removed`);
+  saveState(); refreshStaffList(); refreshDashboard();
+}
+
+function assignStaff(orderId, staffId){
+  const o = state.orders.find(x=>x.id===orderId); if (!o) return;
+  if (!staffId){ o.deliveryStaff = null; saveState(); refreshLiveOrders(); return; }
+  const s = state.staff.find(x=>x.id===staffId); if (!s) return;
+  o.deliveryStaff = { id:s.id, name:s.name, phone:s.phone };
+  if (o.status === 'ready' || o.status === 'preparing') o.status = 'out';
+  logActivity(`Order #${o.num} assigned to ${s.name}`);
+  saveState(); refreshLiveOrders();
+  toast(`Assigned ${s.name} to Order #${o.num}`);
+}
+
+function updateOrderStatus(id, status){
+  const o = state.orders.find(x=>x.id===id); if (!o) return;
+  o.status = status;
+  logActivity(`Order #${o.num} status: ${status}`);
+  saveState(); refreshLiveOrders(); refreshDashboard(); refreshOrderHistory();
+  toast(`Order #${o.num} → ${status}`);
+}
+
+function saveAd(){
+  state.ad.type = document.getElementById('adType').value;
+  state.ad.url = document.getElementById('adUrl').value.trim();
+  state.ad.caption = document.getElementById('adCaption').value.trim();
+  state.ad.duration = parseInt(document.getElementById('adDuration').value)||0;
+  logActivity(`Ad updated (${state.ad.type})`);
+  saveState();
+  toast('Ad saved ✓');
+}
+function toggleAd(){
+  state.ad.enabled = !state.ad.enabled;
+  document.getElementById('toggleAd').classList.toggle('on', state.ad.enabled);
+  document.getElementById('adStatusLbl').textContent = state.ad.enabled ? 'Enabled' : 'Disabled';
+  logActivity(`Ad ${state.ad.enabled ? 'enabled' : 'disabled'}`);
+  saveState();
+}
+function savePayInfo(){
+  state.payment.upiId = document.getElementById('upiId').value.trim();
+  state.payment.qrUrl = document.getElementById('qrUrl').value.trim();
+  logActivity('Payment info updated');
+  saveState(); refreshAdminQR();
+  toast('Payment info saved ✓');
+}
+
+/* ============================================================
+   NEW ORDER NOTIFICATION (admin loud beep + flash)
+   ============================================================ */
+let lastNewSeen = parseInt(localStorage.getItem('momsboy_newOrder')||'0');
+function playLoudBeep(){
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const beep = (start, freq=880) => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.type = 'square'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0, ctx.currentTime + start);
+      g.gain.linearRampToValueAtTime(0.7, ctx.currentTime + start + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + 0.35);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime + start); o.stop(ctx.currentTime + start + 0.4);
+    };
+    beep(0, 1200); beep(0.45, 900); beep(0.9, 1400);
+  } catch(e){ console.log('audio fail',e); }
+}
+function flashScreen(){
+  const fa = document.getElementById('flashAlert');
+  let count = 0;
+  const blink = ()=>{
+    if (count++ > 5) return fa.classList.remove('on');
+    fa.classList.toggle('on');
+    setTimeout(blink, 280);
+  };
+  blink();
+}
+
+function checkForNewOrders(){
+  if (sessionStorage.getItem('momsboy_admin_in') !== '1') return;
+  const t = parseInt(localStorage.getItem('momsboy_newOrder')||'0');
+  if (t > lastNewSeen){
+    lastNewSeen = t;
+    playLoudBeep();
+    flashScreen();
+    refreshLiveOrders();
+    refreshDashboard();
+    refreshPayHistory();
+    refreshOrderHistory();
+    // Force navigate to Live Orders for visibility
+    const navItem = document.querySelector('#adminNav .nav-item[data-sec="liveOrders"]');
+    if (navItem){ navItem.click(); }
+  }
+}
+
+/* ============================================================
+   CUSTOMER REFRESH (poll updates from admin)
+   ============================================================ */
+function refreshCustomer(){
+  // Update tracking screen if open
+  if (document.getElementById('screen-track').classList.contains('active') && trackedOrderId){
+    renderTracking();
+  }
+  // If on menu, refresh availability
+  if (document.getElementById('screen-menu').classList.contains('active')){
+    renderMenu();
+  }
+  checkCafeStatus();
+}
+
+function refreshAll(){
+  // Reload state in case localStorage changed externally
+  state = loadState();
+  refreshCustomer();
+  if (sessionStorage.getItem('momsboy_admin_in') === '1' && document.getElementById('adminApp').classList.contains('show')){
+    refreshAdmin();
+  }
+}
+
+/* Polling fallback for same-tab sync */
+setInterval(()=>{
+  const fresh = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+  if (fresh && JSON.stringify(fresh.orders?.length) !== JSON.stringify(state.orders?.length)){
+    state = loadState();
+    refreshCustomer();
+    if (sessionStorage.getItem('momsboy_admin_in') === '1') refreshAdmin();
+  }
+  checkForNewOrders();
+}, 800);
+
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
